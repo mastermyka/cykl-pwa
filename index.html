@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twój Cykl - Asystent Kobiecy Rozbudowany</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; margin:0; background:#fafafa; color:#333; transition: background 0.3s, color 0.3s; }
+  header { background: linear-gradient(90deg,#ff7a7a,#ff5e62); color:white; padding:1.5rem; text-align:center; }
+  h1 { margin:0; font-size:1.6rem; }
+  .container { padding:1rem; max-width:600px; margin:auto; }
+  .card { background:white; border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:1rem; margin-bottom:1rem; }
+  .phase { padding:1rem; border-radius:12px; color:white; font-weight:bold; text-align:center; transition: background 0.3s; }
+  .menstruacja { background:#ff4d6d; }
+  .folikularna { background:#6fcf97; }
+  .owulacja { background:#56ccf2; }
+  .lutealna { background:#bb6bd9; }
+  label { display:block; margin-top:0.5rem; font-weight:bold; }
+  input { padding:0.5rem; width:100%; margin-top:0.25rem; border-radius:8px; border:1px solid #ddd; }
+  button { padding:0.7rem 1.2rem; margin-top:1rem; background:#ff6f61; color:white; border:none; border-radius:10px; cursor:pointer; width:100%; font-weight:bold; }
+  button:hover { background:#ff8a80; }
+  table { width:100%; border-collapse:collapse; margin-top:0.5rem; }
+  th, td { padding:0.5rem; border:1px solid #ddd; text-align:center; }
+  th { background:#f0f0f0; }
+  .calendar { display:grid; grid-template-columns: repeat(7, 1fr); gap:4px; margin-top:1rem; }
+  .day { padding:8px; border-radius:8px; text-align:center; font-size:0.85rem; transition: background 0.3s; }
+  .menstruacja-day { background:#ff4d6d; color:white; }
+  .folikularna-day { background:#6fcf97; color:white; }
+  .owulacja-day { background:#56ccf2; color:white; }
+  .lutealna-day { background:#bb6bd9; color:white; }
+  .tooltip { font-size:0.75rem; }
+</style>
+</head>
+<body>
+<header>
+<h1>Twój Cykl - Asystent Kobiecy Rozbudowany</h1>
+</header>
+<div class="container">
+<div class="card">
+<h2>Aktualna faza cyklu</h2>
+<div id="currentPhase" class="phase"></div>
+<p><strong>Dzień cyklu:</strong> <span id="cycleDay"></span></p>
+<p><strong>Owulacja:</strong> <span id="ovulationDate"></span></p>
+<p><strong>Dni płodne:</strong> <span id="fertileDays"></span></p>
+<p><strong>Następny okres:</strong> <span id="nextPeriod"></span></p>
+</div>
+
+<div class="card tips">
+<h2>Rekomendacje</h2>
+<p><strong>Żywienie:</strong> <span id="food"></span></p>
+<p><strong>Trening:</strong> <span id="exercise"></span></p>
+<p><strong>Samopoczucie:</strong> <span id="mood"></span></p>
+</div>
+
+<div class="card">
+<h2>Dodaj nowy okres</h2>
+<label for="startDate">Początek okresu:</label>
+<input type="date" id="startDate">
+<label for="endDate">Koniec okresu:</label>
+<input type="date" id="endDate">
+<button onclick="addPeriod()">Dodaj okres</button>
+</div>
+
+<div class="card">
+<h2>Historia cykli</h2>
+<table>
+<thead><tr><th>Początek</th><th>Koniec</th><th>Długość krwawienia</th></tr></thead>
+<tbody id="historyTable"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>Kalendarz ostatniego cyklu</h2>
+<div id="calendar" class="calendar"></div>
+</div>
+</div>
+
+<script>
+const periods = [
+  { start: '2025-01-07', end: '2025-01-10' },
+  { start: '2025-01-30', end: '2025-02-02' },
+  { start: '2025-02-24', end: '2025-02-27' },
+  { start: '2025-03-23', end: '2025-03-26' },
+  { start: '2025-04-16', end: '2025-04-19' },
+  { start: '2025-05-12', end: '2025-05-15' },
+  { start: '2025-06-04', end: '2025-06-07' },
+  { start: '2025-06-28', end: '2025-07-01' },
+  { start: '2025-07-24', end: '2025-07-27' },
+  { start: '2025-08-18', end: '2025-08-21' },
+  { start: '2025-09-12', end: '2025-09-15' },
+  { start: '2025-10-08', end: '2025-10-11' },
+  { start: '2025-10-30', end: '2025-11-02' },
+  { start: '2025-11-25', end: '2025-11-28' },
+  { start: '2025-12-19', end: '2025-12-22' }
+];
+
+const tips = {
+  menstruacja:{food:['żelazo, czerwone mięso, buraki, soczewica'], exercise:'lekki spacer, rozciąganie', mood:'zmęczenie, odpoczynek'},
+  folikularna:{food:['białko, świeże warzywa, jajka'], exercise:'trening siłowy, cardio', mood:'dużo energii, motywacja'},
+  owulacja:{food:['owoce, orzechy, antyoksydanty'], exercise:'intensywny trening, taniec', mood:'pewność siebie, wysokie libido'},
+  lutealna:{food:['ciemna czekolada, banany, magnez'], exercise:'joga, spacery', mood:'wahania nastroju, PMS'}
+};
+
+function parseDate(str){return new Date(str+'T00:00:00');}
+function formatDate(date){return date.toISOString().split('T')[0];}
+function calculateAverageCycle(periods){let total=0;for(let i=1;i<periods.length;i++){total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);}return Math.round(total/(periods.length-1));}
+
+function getCycleInfo(periods){
+  const avgCycle=calculateAverageCycle(periods);
+  const lastPeriod=parseDate(periods[periods.length-1].start);
+  const today=new Date();
+  const dayOfCycle=Math.floor((today-lastPeriod)/(1000*60*60*24))+1;
+  const ovulationDay=13;
+  const fertileStart=new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate()+ovulationDay-5);
+  const fertileEnd=new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate()+ovulationDay);
+  const ovulationDate=new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate()+ovulationDay);
+  const nextPeriod=new Date(lastPeriod); nextPeriod.setDate(nextPeriod.getDate()+avgCycle);
+  let phase='',phaseClass='';
+  if(dayOfCycle<=4){phase='menstruacja';phaseClass='menstruacja';}
+  else if(dayOfCycle<=ovulationDay-2){phase='folikularna';phaseClass='folikularna';}
+  else if(dayOfCycle===ovulationDay||dayOfCycle===ovulationDay-1){phase='owulacja';phaseClass='owulacja';}
+  else{phase='lutealna';phaseClass='lutealna';}
+  return {phase,phaseClass,dayOfCycle,fertileDays:[formatDate(fertileStart),formatDate(fertileEnd)],ovulationDate:formatDate(ovulationDate),nextPeriod:formatDate(nextPeriod),tips:tips[phase]};
+}
+
+function updateHistory(){
+  const tbody=document.getElementById('historyTable'); tbody.innerHTML='';
+  periods.forEach(p=>{const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1; tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;});
+}
+
+function updateCalendar(){
+  const calendar=document.getElementById('calendar'); calendar.innerHTML='';
+  const info=getCycleInfo(periods);
+  const lastPeriod=parseDate(periods[periods.length-1].start);
+  const avgCycle=calculateAverageCycle(periods);
+  for(let i=0;i<avgCycle;i++){
+    const day=new Date(lastPeriod); day.setDate(day.getDate()+i);
+    let cls='';
+    if(i<4) cls='menstruacja-day';
+    else if(i<12) cls='folikularna-day';
+    else if(i===12||i===11) cls='owulacja-day';
+    else cls='lutealna-day';
+    calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}'>${day.getDate()}</div>`;
+  }
+}
+
+function updateUI(){
+  const info=getCycleInfo(periods);
+  const phaseDiv=document.getElementById('currentPhase'); phaseDiv.textContent=info.phase.toUpperCase(); phaseDiv.className=`phase ${info.phaseClass}`;
+  document.getElementById('cycleDay').textContent=info.dayOfCycle;
+  document.getElementById('ovulationDate').textContent=info.ovulationDate;
+  document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
+  document.getElementById('nextPeriod').textContent=info.nextPeriod;
+  document.getElementById('food').textContent=info.tips.food;
+  document.getElementById('exercise').textContent=info.tips.exercise;
+  document.getElementById('mood').textContent=info.tips.mood;
+  updateHistory(); updateCalendar();
+}
+
+function addPeriod(){
+  const start=document.getElementById('startDate').value;
+  const end=document.getElementById('endDate').value;
+  if(start&&end){periods.push({start,end});updateUI();alert('Dodano okres!');}
+  else alert('Wprowadź obie daty.');
+}
+
+updateUI();
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js').then(()=>console.log('Service Worker zarejestrowany'));}
+</script>
+</body>
+</html>
