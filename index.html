@@ -181,9 +181,7 @@
 </div>
 
 <script>
-// ===============================
-// --- GLOBALNE ZMIENNE ---
-// ===============================
+// --- Dane i wczytywanie JSON ---
 const periods = [
   { start: '2025-01-07', end: '2025-01-10' },
   { start: '2025-01-30', end: '2025-02-02' },
@@ -201,26 +199,27 @@ const periods = [
   { start: '2025-11-25', end: '2025-11-28' },
   { start: '2025-12-19', end: '2025-12-22' }
 ];
+const tips = {
+  menstruacja: { food:['Szpinak z jajkiem','Sałatka z burakami','Smoothie malinowe'], exercise:['Lekki spacer','Rozciąganie'], mood:'Zmęczenie' },
+  folikularna: { food:['Jajka z warzywami','Owsianka','Sałatka z kurczakiem'], exercise:['Trening siłowy','Cardio'], mood:'Dużo energii' },
+  owulacja: { food:['Owoce sezonowe','Orzechy','Smoothie jagodowe'], exercise:['Intensywny trening','Taniec'], mood:'Pewność siebie' },
+  lutealna: { food:['Czekolada','Banany','Produkty bogate w magnez'], exercise:['Joga','Spacery'], mood:'Wahania nastroju' }
+};
 
-// Obiekty na tipy
-let quotesTipsData = {}, foodData = {}, wellnessData = {}, intimacyData = {};
+let quotesTipsData={}, foodData={}, wellnessData={}, intimacyData={};
+fetch('quotesTips.json').then(r=>r.json()).then(d=>{ quotesTipsData=d; updateUI(); });
+fetch('foodTips.json').then(r=>r.json()).then(d=>{ foodData=d; updateUI(); });
+fetch('wellnessTips.json').then(r=>r.json()).then(d=>{ wellnessData=d; updateUI(); });
+fetch('intimacyTips.json').then(r=>r.json()).then(d=>{ intimacyData=d; updateUI(); })
+.catch(err=>console.error('Nie udało się załadować tipów intymności:', err));
 
-// Objawy dnia (z LocalStorage)
-let symptoms = JSON.parse(localStorage.getItem('symptoms')) || {};
-
-// Aktualny cykl w kalendarzu
-let currentCycleIndex = periods.length - 1;
-
-// ===============================
-// --- FUNKCJE POMOCNICZE ---
-// ===============================
-function parseDate(str){ return new Date(str + 'T00:00:00'); }
-function formatDate(d){ return d.toISOString().split('T')[0]; }
+function parseDate(str){return new Date(str+'T00:00:00');}
+function formatDate(d){return d.toISOString().split('T')[0];}
 
 function calculateAverageCycle(periods){
-  let total = 0;
+  let total=0;
   for(let i=1;i<periods.length;i++){
-    total += (parseDate(periods[i].start) - parseDate(periods[i-1].start))/(1000*60*60*24);
+    total += (parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);
   }
   return Math.round(total/(periods.length-1));
 }
@@ -231,7 +230,6 @@ function getCycleInfo(periods){
   const today = new Date();
   const dayOfCycle = Math.floor((today-lastPeriod)/(1000*60*60*24))+1;
   const ovulationDay = 13;
-
   const fertileStart = new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate()+ovulationDay-5);
   const fertileEnd = new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate()+ovulationDay);
   const ovulationDate = new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate()+ovulationDay);
@@ -246,18 +244,9 @@ function getCycleInfo(periods){
   return { phase, phaseClass, dayOfCycle, fertileDays:[formatDate(fertileStart),formatDate(fertileEnd)], ovulationDate:formatDate(ovulationDate), nextPeriod:formatDate(nextPeriod) };
 }
 
-function getCurrentPhaseClass() {
-  return getCycleInfo(periods).phase;
-}
+// --- Losowe elementy ---
+function getRandomItems(arr,n=1){ if(!arr || !arr.length) return []; return [...arr].sort(()=>0.5-Math.random()).slice(0,n); }
 
-function getRandomItems(arr,n=1){ 
-  if(!arr || !arr.length) return []; 
-  return [...arr].sort(()=>0.5-Math.random()).slice(0,n); 
-}
-
-// ===============================
-// --- AKORDEONY ---
-// ===============================
 function createAccordion(containerId,data,randomize=false){
   const container=document.getElementById(containerId); container.innerHTML='';
   if(!data) return;
@@ -278,9 +267,94 @@ function createAccordion(containerId,data,randomize=false){
   }
 }
 
-// ===============================
-// --- MODAL ---
-// ===============================
+// --- Aktualizacja UI ---
+function updateUI(){
+  const info=getCycleInfo(periods);
+  const phaseDiv=document.getElementById('currentPhase');
+  phaseDiv.textContent=info.phase.toUpperCase();
+  phaseDiv.className=`phase ${info.phaseClass}`;
+
+  document.getElementById('cycleDay').textContent=info.dayOfCycle;
+  document.getElementById('ovulationDate').textContent=info.ovulationDate;
+  document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
+  document.getElementById('nextPeriod').textContent=info.nextPeriod;
+
+  createAccordion('foodAccordion', foodData[info.phase], true);
+  createAccordion('wellnessAccordion', wellnessData[info.phase], true);
+  const intimacyTips = intimacyData[info.phase] || [];
+const randomIntimacyTip = intimacyTips[Math.floor(Math.random() * intimacyTips.length)] || '';
+document.getElementById('intimacyAccordion').innerHTML = `<div class="intimacy-tip">${randomIntimacyTip}</div>`;
+
+
+  document.getElementById('dailyQuote').textContent=quotesTipsData[info.phase]?.quotes?.[Math.floor(Math.random()*(quotesTipsData[info.phase]?.quotes?.length||1))]||'';
+  document.getElementById('dailyTip').textContent=quotesTipsData[info.phase]?.tips?.[Math.floor(Math.random()*(quotesTipsData[info.phase]?.tips?.length||1))]||'';
+
+  updateHistory();
+  updateCalendar();
+}
+  function getCurrentPhaseClass() {
+  const info = getCycleInfo(periods);
+  return info.phase;
+}
+if (document.getElementById('dayModal').style.display === 'flex') {
+  showDayModal(formatDate(new Date()), getCurrentPhaseClass());
+}
+
+
+
+// --- Historia i kalendarz ---
+function updateHistory(){
+  const tbody=document.getElementById('historyTable'); tbody.innerHTML='';
+  periods.forEach(p=>{
+    const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1;
+    tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
+  });
+}
+let currentCycleIndex = periods.length - 1;
+
+function showPreviousCycle() {
+  if (currentCycleIndex > 0) {
+    currentCycleIndex--;
+    updateCalendar();
+  }
+}
+
+function showNextCycle() {
+  if (currentCycleIndex < periods.length - 1) {
+    currentCycleIndex++;
+    updateCalendar();
+  }
+}
+
+function updateCalendar() {
+  const calendar = document.getElementById('calendar');
+  calendar.innerHTML = '';
+
+  const period = periods[currentCycleIndex];
+  const avgCycle = calculateAverageCycle(periods);
+  const startDate = parseDate(period.start);
+
+  for (let i = 0; i < avgCycle; i++) {
+    const day = new Date(startDate);
+    day.setDate(day.getDate() + i);
+    let cls = '';
+    if (i < 4) cls = 'menstruacja-day';
+    else if (i < 12) cls = 'folikularna-day';
+    else if (i === 11 || i === 12) cls = 'owulacja-day';
+    else cls = 'lutealna-day';
+    calendar.innerHTML += `
+      <div class='day ${cls}' title='${formatDate(day)}'
+           onclick='showDayModal("${formatDate(day)}","${cls}")'>
+        ${day.getDate()}
+      </div>`;
+  }
+
+  // aktualizacja tytułu karty
+  document.querySelector(".card h2").textContent =
+    "Kalendarz cyklu: " + (currentCycleIndex + 1) + " z " + periods.length;
+}
+
+
 function showDayModal(date, phaseClass) {
   let phase = '';
   if (phaseClass.includes('menstruacja')) phase = 'menstruacja';
@@ -292,13 +366,15 @@ function showDayModal(date, phaseClass) {
   document.getElementById('modalDate').textContent = date;
   document.getElementById('modalPhase').textContent = 'Faza: ' + phase.toUpperCase();
 
+  // Akordeony
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
 
+  // Objawy dnia
   const symptomsContainer = document.getElementById('modalSymptoms');
-  symptomsContainer.innerHTML = '';
+  symptomsContainer.innerHTML = ''; // wyczyść poprzednie
   const symptom = symptoms[date];
-  if(symptom){
+  if (symptom) {
     symptomsContainer.innerHTML = `
       <div class="symptom-card">
         <h4>Objawy zapisane:</h4>
@@ -311,6 +387,7 @@ function showDayModal(date, phaseClass) {
     symptomsContainer.innerHTML = `<p>Brak zapisanych objawów.</p>`;
   }
 
+  // Intymność
   const modalIntimacyTips = intimacyData[phase] || [];
   const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
   document.getElementById('modalIntimacy').innerHTML = `<div class="intimacy-tip">${randomModalIntimacyTip}</div>`;
@@ -318,60 +395,25 @@ function showDayModal(date, phaseClass) {
   modal.style.display = 'flex';
 }
 
+
 document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
 
-// ===============================
-// --- HISTORIA I KALENDARZ ---
-// ===============================
-function updateHistory(){
-  const tbody=document.getElementById('historyTable'); tbody.innerHTML='';
-  periods.forEach(p=>{
-    const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1;
-    tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
-  });
+// --- Dodawanie i LocalStorage ---
+function saveHistory(){ localStorage.setItem('cycleHistory',JSON.stringify(periods)); }
+function loadHistory(){
+  const data=localStorage.getItem('cycleHistory');
+  if(data){ try{ const arr=JSON.parse(data); if(Array.isArray(arr)) periods.splice(0,periods.length,...arr); }catch(e){console.error(e);} }
 }
 
-function updateCalendar() {
-  const calendar = document.getElementById('calendar');
-  calendar.innerHTML = '';
-
-  const period = periods[currentCycleIndex];
-  const avgCycle = calculateAverageCycle(periods); // średnia długość cyklu
-  const startDate = parseDate(period.start);
-
-  for (let i = 0; i < avgCycle; i++) {
-    const day = new Date(startDate);
-    day.setDate(day.getDate() + i);
-
-    let cls = '';
-    const dayOfCycle = i + 1;
-    if (dayOfCycle <= 4) cls = 'menstruacja-day';
-    else if (dayOfCycle <= 12) cls = 'folikularna-day';
-    else if (dayOfCycle === 13 || dayOfCycle === 14) cls = 'owulacja-day';
-    else cls = 'lutealna-day';
-
-    calendar.innerHTML += `
-      <div class='day ${cls}' title='${formatDate(day)}'
-           onclick='showDayModal("${formatDate(day)}","${cls}")'>
-        ${day.getDate()}
-      </div>`;
-  }
-
-  document.querySelector(".card h2").textContent =
-    "Kalendarz cyklu: " + (currentCycleIndex + 1) + " z " + periods.length;
+function addPeriod(){
+  const start=document.getElementById('startDate').value;
+  const end=document.getElementById('endDate').value;
+  if(start && end){ periods.push({start,end}); saveHistory(); updateUI(); alert('Dodano okres!'); }
+  else alert('Wprowadź obie daty.');
 }
+// --- Objawy dnia ---
+let symptoms = JSON.parse(localStorage.getItem('symptoms')) || {};
 
-
-function showPreviousCycle() {
-  if (currentCycleIndex > 0) { currentCycleIndex--; updateCalendar(); }
-}
-function showNextCycle() {
-  if (currentCycleIndex < periods.length - 1) { currentCycleIndex++; updateCalendar(); }
-}
-
-// ===============================
-// --- ZAPIS OBJAWÓW ---
-// ===============================
 function saveSymptoms(){
   const date = formatDate(new Date());
   symptoms[date] = {
@@ -384,9 +426,7 @@ function saveSymptoms(){
   alert('Zapisano objawy dnia!');
 }
 
-// ===============================
-// --- EKSPORT / IMPORT ---
-// ===============================
+// --- Eksport / Import JSON ---
 function exportHistory(){
   const dataStr = JSON.stringify(periods,null,2);
   const blob = new Blob([dataStr],{type:"application/json"});
@@ -394,7 +434,6 @@ function exportHistory(){
   const a=document.createElement('a'); a.href=url; a.download='cycleHistory.json'; a.click();
   URL.revokeObjectURL(url);
 }
-
 function importHistory(){
   const file=document.getElementById('importFile').files[0];
   if(!file) return alert('Wybierz plik JSON!');
@@ -409,74 +448,12 @@ function importHistory(){
   reader.readAsText(file);
 }
 
-// ===============================
-// --- LOCALSTORAGE HISTORIA ---
-// ===============================
-function saveHistory(){ localStorage.setItem('cycleHistory',JSON.stringify(periods)); }
-function loadHistory(){
-  const data=localStorage.getItem('cycleHistory');
-  if(data){ try{ const arr=JSON.parse(data); if(Array.isArray(arr)) periods.splice(0,periods.length,...arr); }catch(e){console.error(e);} }
-}
-
-// ===============================
-// --- AKTUALIZACJA UI ---
-// ===============================
-function updateUI(){
-  const info=getCycleInfo(periods);
-  const phaseDiv=document.getElementById('currentPhase');
-  phaseDiv.textContent=info.phase.toUpperCase();
-  phaseDiv.className=`phase ${info.phaseClass}`;
-
-  document.getElementById('cycleDay').textContent=info.dayOfCycle;
-  document.getElementById('ovulationDate').textContent=info.ovulationDate;
-  document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
-  document.getElementById('nextPeriod').textContent=info.nextPeriod;
-
-  createAccordion('foodAccordion', foodData[info.phase], true);
-  createAccordion('wellnessAccordion', wellnessData[info.phase], true);
-
-  const intimacyTips = intimacyData[info.phase] || [];
-  const randomIntimacyTip = intimacyTips[Math.floor(Math.random() * intimacyTips.length)] || '';
-  document.getElementById('intimacyAccordion').innerHTML = `<div class="intimacy-tip">${randomIntimacyTip}</div>`;
-
-  document.getElementById('dailyQuote').textContent = quotesTipsData[info.phase]?.quotes?.[Math.floor(Math.random()*(quotesTipsData[info.phase]?.quotes?.length||1))] || '';
-  document.getElementById('dailyTip').textContent = quotesTipsData[info.phase]?.tips?.[Math.floor(Math.random()*(quotesTipsData[info.phase]?.tips?.length||1))] || '';
-
-  updateHistory();
-  updateCalendar();
-}
-
-// ===============================
-// --- FETCH JSON ---
-// ===============================
-// --- Wczytywanie wszystkich JSONów jednocześnie ---
-Promise.all([
-  fetch('quotesTips.json').then(r => r.json()),
-  fetch('foodTips.json').then(r => r.json()),
-  fetch('wellnessTips.json').then(r => r.json()),
-  fetch('intimacyTips.json').then(r => r.json())
-]).then(([quotes, food, wellness, intimacy]) => {
-  quotesTipsData = quotes;
-  foodData = food;
-  wellnessData = wellness;
-  intimacyData = intimacy;
-
-  loadHistory();    // wczytaj historię z localStorage
-  updateUI();       // aktualizacja całego UI
-  showDayModal(formatDate(new Date()), getCurrentPhaseClass()); // otwórz modal dzisiaj
-}).catch(err => console.error('Błąd wczytywania tipów:', err));
-
-// ===============================
-// --- SERVICE WORKER ---
-// ===============================
+// --- Service Worker ---
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany')); }
 
-// ===============================
-// --- START ---
-// ===============================
+// --- Start ---
 loadHistory();
 updateUI();
 </script>
-
 </body>
 </html>
