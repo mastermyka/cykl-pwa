@@ -353,7 +353,6 @@ function updateCalendar() {
 }
 
 
-// --- Modal ---
 function showDayModal(date, phaseClass) {
   let phase = '';
   if (phaseClass.includes('menstruacja')) phase = 'menstruacja';
@@ -365,16 +364,15 @@ function showDayModal(date, phaseClass) {
   document.getElementById('modalDate').textContent = date;
   document.getElementById('modalPhase').textContent = 'Faza: ' + phase.toUpperCase();
 
-  // Tippy z tipami
+  // Akordeony
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
 
   // Objawy dnia
-  const symptom = symptoms[date];  // <-- deklarujemy tylko raz
   const symptomsContainer = document.getElementById('modalSymptoms');
   symptomsContainer.innerHTML = ''; // wyczyść poprzednie
+  const symptom = symptoms[date];
   if (symptom) {
-    // Wstawiamy w osobnym kontenerze
     symptomsContainer.innerHTML = `
       <div class="symptom-card">
         <h4>Objawy zapisane:</h4>
@@ -383,16 +381,8 @@ function showDayModal(date, phaseClass) {
         <p><strong>Energia:</strong> ${symptom.energy}/10</p>
         <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
       </div>`;
-
-    // Jeśli chcesz dodatkowo do wellness
-    document.getElementById('modalWellness').innerHTML += `
-      <div class="symptom-card">
-        <h4>Objawy zapisane:</h4>
-        <p><strong>Ból:</strong> ${symptom.pain}/10</p>
-        <p><strong>Nastrój:</strong> ${symptom.mood}</p>
-        <p><strong>Energia:</strong> ${symptom.energy}/10</p>
-        <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
-      </div>`;
+  } else {
+    symptomsContainer.innerHTML = `<p>Brak zapisanych objawów.</p>`;
   }
 
   // Intymność
@@ -402,6 +392,7 @@ function showDayModal(date, phaseClass) {
 
   modal.style.display = 'flex';
 }
+
 
 document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
 
