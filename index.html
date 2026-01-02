@@ -177,158 +177,172 @@ const tips = {
   lutealna: { food:['Czekolada','Banany','Produkty bogate w magnez'], exercise:['Joga','Spacery'], mood:'Wahania nastroju' }
 };
 
-let quotesTipsData = {};
-fetch('quotesTips.json').then(r=>r.json()).then(data=>{ quotesTipsData = data; updateUI(); });
-let foodData={}, wellnessData={};
-fetch('foodTips.json').then(r=>r.json()).then(data=>{ foodData=data; updateUI(); });
-fetch('wellnessTips.json').then(r=>r.json()).then(data=>{ wellnessData=data; updateUI(); });
-let intimacyData = {};
+// zmienne na JSONy
+let quotesTipsData = null, foodData = null, wellnessData = null, intimacyData = null;
+
+// funkcja sprawdzająca, czy wszystkie pliki JSON załadowane
+function tryUpdateUI() {
+  if(quotesTipsData && foodData && wellnessData && intimacyData) updateUI();
+}
+
+// wczytanie JSONów
+fetch('quotesTips.json').then(r=>r.json()).then(data=>{ quotesTipsData = data; tryUpdateUI(); });
+fetch('foodTips.json').then(r=>r.json()).then(data=>{ foodData = data; tryUpdateUI(); });
+fetch('wellnessTips.json').then(r=>r.json()).then(data=>{ wellnessData = data; tryUpdateUI(); });
 fetch('intimacyTips.json')
-  .then(r => r.json())
-  .then(data => { intimacyData = data; updateUI(); })
+  .then(r=>r.json())
+  .then(data=>{ intimacyData = data; tryUpdateUI(); })
   .catch(err => console.error('Nie udało się załadować tipów intymności:', err));
 
+// ---- Funkcje pomocnicze ----
 function parseDate(str){return new Date(str+'T00:00:00');}
 function formatDate(date){return date.toISOString().split('T')[0];}
-function calculateAverageCycle(periods){let total=0; for(let i=1;i<periods.length;i++){total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);} return Math.round(total/(periods.length-1));}
+function calculateAverageCycle(periods){
+  let total=0; 
+  for(let i=1;i<periods.length;i++){
+    total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);
+  } 
+  return Math.round(total/(periods.length-1));
+}
+
 function getCycleInfo(periods){
-  const avgCycle=calculateAverageCycle(periods);
-  const lastPeriod=parseDate(periods[periods.length-1].start);
-  const today=new Date();
-  const dayOfCycle=Math.floor((today-lastPeriod)/(1000*60*60*24))+1;
-  const ovulationDay=13;
-  const fertileStart=new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate()+ovulationDay-5);
-  const fertileEnd=new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate()+ovulationDay);
-  const ovulationDate=new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate()+ovulationDay);
-  const nextPeriod=new Date(lastPeriod); nextPeriod.setDate(nextPeriod.getDate()+avgCycle);
-  let phase='',phaseClass='';
-  if(dayOfCycle<=4){phase='menstruacja';phaseClass='menstruacja';}
-  else if(dayOfCycle<=ovulationDay-2){phase='folikularna';phaseClass='folikularna';}
-  else if(dayOfCycle===ovulationDay||dayOfCycle===ovulationDay-1){phase='owulacja';phaseClass='owulacja';}
-  else{phase='lutealna';phaseClass='lutealna';}
+  const avgCycle = calculateAverageCycle(periods);
+  const lastPeriod = parseDate(periods[periods.length-1].start);
+  const today = new Date();
+  const dayOfCycle = Math.floor((today - lastPeriod)/(1000*60*60*24)) + 1;
+  const ovulationDay = 13;
+  const fertileStart = new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate() + ovulationDay - 5);
+  const fertileEnd = new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate() + ovulationDay);
+  const ovulationDate = new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate() + ovulationDay);
+  const nextPeriod = new Date(lastPeriod); nextPeriod.setDate(nextPeriod.getDate() + avgCycle);
+
+  let phase='', phaseClass='';
+  if(dayOfCycle<=4){ phase='menstruacja'; phaseClass='menstruacja'; }
+  else if(dayOfCycle<=ovulationDay-2){ phase='folikularna'; phaseClass='folikularna'; }
+  else if(dayOfCycle===ovulationDay||dayOfCycle===ovulationDay-1){ phase='owulacja'; phaseClass='owulacja'; }
+  else{ phase='lutealna'; phaseClass='lutealna'; }
+
   return {
-    phase,phaseClass,dayOfCycle,
-    fertileDays:[formatDate(fertileStart),formatDate(fertileEnd)],
-    ovulationDate:formatDate(ovulationDate),
-    nextPeriod:formatDate(nextPeriod),
+    phase, phaseClass, dayOfCycle,
+    fertileDays:[formatDate(fertileStart), formatDate(fertileEnd)],
+    ovulationDate: formatDate(ovulationDate),
+    nextPeriod: formatDate(nextPeriod),
     tips: tips[phase],
-    quote: quotesTipsData[phase]?.quotes?.[Math.floor(Math.random()*(quotesTipsData[phase]?.quotes?.length||1))]||'',
-    wellnessTip: quotesTipsData[phase]?.tips?.[Math.floor(Math.random()*(quotesTipsData[phase]?.tips?.length||1))]||''
+    quote: quotesTipsData[phase]?.quotes?.[Math.floor(Math.random()*(quotesTipsData[phase]?.quotes?.length||1))] || '',
+    wellnessTip: quotesTipsData[phase]?.tips?.[Math.floor(Math.random()*(quotesTipsData[phase]?.tips?.length||1))] || ''
   };
 }
 
-function updateHistory(){
-  const tbody=document.getElementById('historyTable'); tbody.innerHTML='';
-  periods.forEach(p=>{
-    const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1;
-    tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
-  });
-}
-
-function updateCalendar(){
-  const calendar=document.getElementById('calendar'); calendar.innerHTML='';
-  const lastPeriod=parseDate(periods[periods.length-1].start);
-  const avgCycle=calculateAverageCycle(periods);
-  for(let i=0;i<avgCycle;i++){
-    const day=new Date(lastPeriod); day.setDate(day.getDate()+i);
-    let cls='';
-    if(i<4) cls='menstruacja-day';
-    else if(i<12) cls='folikularna-day';
-    else if(i===12||i===11) cls='owulacja-day';
-    else cls='lutealna-day';
-    calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayModal("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
-  }
-}
-
-// Akordeon
+// ---- UI ----
 function createAccordion(containerId, data){
-  const container=document.getElementById(containerId); container.innerHTML='';
+  if(!data) return;
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
   for(const key in data){
-    const div=document.createElement('div');
-    div.innerHTML=`<button class="accordion-btn" onclick="this.nextElementSibling.classList.toggle('active')">${key}</button>
-      <ul class="accordion-content">${data[key].map(item=>`<li>${item}</li>`).join('')}</ul>`;
+    if(!Array.isArray(data[key])) continue; // zabezpieczenie przed błędem
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <button class="accordion-btn" onclick="this.nextElementSibling.classList.toggle('active')">${key}</button>
+      <ul class="accordion-content">${data[key].map(item => `<li>${item}</li>`).join('')}</ul>
+    `;
     container.appendChild(div);
   }
 }
 
 function updateUI(){
-  if(!quotesTipsData || !foodData || !wellnessData) return;
-  const info=getCycleInfo(periods);
-  const phaseDiv=document.getElementById('currentPhase'); 
-  phaseDiv.textContent=info.phase.toUpperCase(); 
-  phaseDiv.className=`phase ${info.phaseClass}`;
-  document.getElementById('cycleDay').textContent=info.dayOfCycle;
-  document.getElementById('ovulationDate').textContent=info.ovulationDate;
-  document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
-  document.getElementById('nextPeriod').textContent=info.nextPeriod;
+  if(!quotesTipsData || !foodData || !wellnessData || !intimacyData) return;
+  const info = getCycleInfo(periods);
+  const phaseDiv = document.getElementById('currentPhase');
+  phaseDiv.textContent = info.phase.toUpperCase();
+  phaseDiv.className = `phase ${info.phaseClass}`;
+
+  document.getElementById('cycleDay').textContent = info.dayOfCycle;
+  document.getElementById('ovulationDate').textContent = info.ovulationDate;
+  document.getElementById('fertileDays').textContent = `${info.fertileDays[0]} - ${info.fertileDays[1]}`;
+  document.getElementById('nextPeriod').textContent = info.nextPeriod;
+
   createAccordion('foodAccordion', foodData[info.phase]);
   createAccordion('wellnessAccordion', wellnessData[info.phase]);
   createAccordion('intimacyAccordion', { [info.phase]: intimacyData[info.phase] });
-  document.getElementById('dailyQuote').textContent=info.quote;
-  document.getElementById('dailyTip').textContent=info.wellnessTip;
+
+  document.getElementById('dailyQuote').textContent = info.quote;
+  document.getElementById('dailyTip').textContent = info.wellnessTip;
+
   updateHistory();
   updateCalendar();
 }
 
-function addPeriod(){
-  const start=document.getElementById('startDate').value;
-  const end=document.getElementById('endDate').value;
-  if(start&&end){periods.push({start,end});updateUI();alert('Dodano okres!');}
-  else alert('Wprowadź obie daty.');
+function updateHistory(){
+  const tbody = document.getElementById('historyTable');
+  tbody.innerHTML = '';
+  periods.forEach(p=>{
+    const len = (parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1;
+    tbody.innerHTML += `<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
+  });
 }
 
-// --- Modal ---
+function updateCalendar(){
+  const calendar = document.getElementById('calendar');
+  calendar.innerHTML = '';
+  const lastPeriod = parseDate(periods[periods.length-1].start);
+  const avgCycle = calculateAverageCycle(periods);
+  for(let i=0;i<avgCycle;i++){
+    const day = new Date(lastPeriod); day.setDate(day.getDate()+i);
+    let cls='';
+    if(i<4) cls='menstruacja-day';
+    else if(i<12) cls='folikularna-day';
+    else if(i===12||i===11) cls='owulacja-day';
+    else cls='lutealna-day';
+    calendar.innerHTML += `<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayModal("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
+  }
+}
+
+// ---- Modal ----
 function showDayModal(date, phaseClass){
-  const info=getCycleInfo(periods);
   let phase='';
   if(phaseClass.includes('menstruacja')) phase='menstruacja';
   else if(phaseClass.includes('folikularna')) phase='folikularna';
   else if(phaseClass.includes('owulacja')) phase='owulacja';
   else phase='lutealna';
+
   const modal=document.getElementById('dayModal');
   document.getElementById('modalDate').textContent=date;
   document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
+
   createAccordion('modalFood', foodData[phase]);
   createAccordion('modalWellness', wellnessData[phase]);
   createAccordion('modalIntimacy', { [phase]: intimacyData[phase] });
+
   modal.style.display='flex';
 }
-document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
 
-// Service Worker
-if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany'));}
-// --- LocalStorage ---
-function saveHistory(){
-  localStorage.setItem('cycleHistory', JSON.stringify(periods));
-}
+document.getElementById('closeModal').addEventListener('click', ()=>{ document.getElementById('dayModal').style.display='none'; });
 
+// ---- LocalStorage ----
+function saveHistory(){ localStorage.setItem('cycleHistory', JSON.stringify(periods)); }
 function loadHistory(){
   const data = localStorage.getItem('cycleHistory');
   if(data){
     try{
       const arr = JSON.parse(data);
       if(Array.isArray(arr)) periods.splice(0, periods.length, ...arr);
-    }catch(e){ console.error('Błąd wczytywania historii:', e);}
+    }catch(e){ console.error('Błąd wczytywania historii:', e); }
   }
 }
 
-// --- Eksport / Import JSON ---
+// ---- Eksport / Import JSON ----
 function exportHistory(){
-  const dataStr = JSON.stringify(periods, null, 2);
-  const blob = new Blob([dataStr], {type:"application/json"});
+  const dataStr = JSON.stringify(periods,null,2);
+  const blob = new Blob([dataStr],{type:"application/json"});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'cycleHistory.json';
-  a.click();
+  const a = document.createElement('a'); a.href=url; a.download='cycleHistory.json'; a.click();
   URL.revokeObjectURL(url);
 }
-
 function importHistory(){
   const file = document.getElementById('importFile').files[0];
   if(!file) return alert('Wybierz plik JSON!');
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = e=>{
     try{
       const arr = JSON.parse(e.target.result);
       if(Array.isArray(arr)){
@@ -336,17 +350,13 @@ function importHistory(){
         saveHistory();
         updateUI();
         alert('Historia zaimportowana!');
-      }else alert('Niepoprawny format JSON!');
-    }catch(err){ alert('Błąd parsowania JSON'); }
+      } else alert('Niepoprawny format JSON!');
+    } catch(err){ alert('Błąd parsowania JSON'); }
   };
   reader.readAsText(file);
 }
 
-// --- Na starcie wczytanie historii ---
-loadHistory();
-updateUI();
-
-// Dodaj w addPeriod() też zapisywanie do localStorage
+// ---- Dodawanie okresu ----
 function addPeriod(){
   const start=document.getElementById('startDate').value;
   const end=document.getElementById('endDate').value;
@@ -355,8 +365,17 @@ function addPeriod(){
     saveHistory();
     updateUI();
     alert('Dodano okres!');
-  }else alert('Wprowadź obie daty.');
+  } else alert('Wprowadź obie daty.');
 }
+
+// ---- Start ----
+loadHistory();
+tryUpdateUI();
+
+// ---- Service Worker ----
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany')); }
+
 </script>
+
 </body>
 </html>
