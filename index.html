@@ -3,25 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cykl Kobiecy - PWA</title>
+<title>Twój Cykl Kobiecy - PWA</title>
 <style>
   body { font-family: Arial, sans-serif; margin:0; padding:0; background:#fff; color:#333;}
   header { background:#ff8da1; color:#fff; padding:15px; text-align:center; font-size:1.5em;}
   #quote, #wellness { margin:15px; font-size:1.2em; text-align:center;}
   #calendar { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; margin:15px;}
-  .day { border:1px solid #ccc; padding:10px; text-align:center; cursor:pointer; user-select:none; }
+  .day { border:1px solid #ccc; padding:10px; text-align:center; cursor:pointer; user-select:none; border-radius:5px;}
   .menstruation { background:#ffb3b3; }
   .follicular { background:#ffd9b3; }
   .ovulation { background:#b3ffc6; }
   .luteal { background:#b3d9ff; }
   /* Popup */
-  #popup { position:fixed; top:0; left:0; width:100%; height:100%; display:none; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-  #popupContent { background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px; }
+  #popup { position:fixed; top:0; left:0; width:100%; height:100%; display:none; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; flex-direction:column; z-index:1000;}
+  #popupContent { background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px; box-shadow:0 4px 8px rgba(0,0,0,0.2);}
   #popupContent h3 { margin-top:0; }
   #popupContent label { display:block; margin-top:10px; }
-  #popupContent textarea { width:100%; height:60px; }
-  #popupContent select { width:100%; padding:5px; }
-  #popupContent button { margin-top:10px; padding:10px; width:48%; }
+  #popupContent textarea { width:100%; height:60px; margin-top:5px; }
+  #popupContent select { width:100%; padding:5px; margin-top:5px; }
+  #popupContent button { margin-top:10px; padding:10px; width:48%; border:none; border-radius:5px; cursor:pointer; }
+  #popupContent button#saveBtn { background:#4CAF50; color:#fff; }
+  #popupContent button#closeBtn { background:#f44336; color:#fff; }
 </style>
 </head>
 <body>
@@ -57,7 +59,7 @@
 
 <script>
 // --------------------------
-// Etap 2: Cytaty i wellness
+// Cytaty i wellness
 // --------------------------
 const quotes = [
 "Każdy dzień to nowy początek.",
@@ -310,12 +312,11 @@ showDailyQuote();
 showDailyWellness();
 
 // --------------------------
-// Etap 3: Interaktywny kalendarz
+// Interaktywny kalendarz
 // --------------------------
 const calendarDiv = document.getElementById('calendar');
 
 const cycleData = [
-  // Wstaw swoje dane z początkami i końcami miesiączek
   {start:"2025-01-07", end:"2025-01-10"},
   {start:"2025-01-30", end:"2025-02-02"},
   {start:"2025-02-24", end:"2025-02-27"},
@@ -333,16 +334,13 @@ const cycleData = [
   {start:"2025-12-19", end:"2025-12-22"},
 ];
 
-// Funkcja do określania fazy dnia
 function getPhase(date) {
   const d = new Date(date);
-  // Dni menstruacji
   for(const c of cycleData){
     const start = new Date(c.start);
     const end = new Date(c.end);
     if(d>=start && d<=end) return {phase:"menstruation", label:"Menstruacja"};
   }
-  // Przybliżone fazy (dla przykładu, 14 dni cyklu)
   const lastStart = new Date(cycleData[cycleData.length-1].start);
   const diff = Math.floor((d-lastStart)/86400000) % 28;
   if(diff>=0 && diff<6) return {phase:"follicular", label:"Faza folikularna"};
@@ -350,7 +348,6 @@ function getPhase(date) {
   return {phase:"luteal", label:"Faza lutealna"};
 }
 
-// Tworzenie kalendarza (np. miesiąc bieżący)
 function updateCalendar() {
   calendarDiv.innerHTML="";
   const today = new Date();
@@ -386,9 +383,9 @@ function openPopup(dateStr) {
   popupDate.textContent = dateStr;
   const phaseObj = getPhase(dateStr);
   popupPhase.textContent = phaseObj.label;
-  const saved = JSON.parse(localStorage.getItem("day-"+dateStr)||"{}");
-  popupNotes.value = saved.notes||"";
-  popupActivity.value = saved.activity||"";
+  const saved = JSON.parse(localStorage.getItem("day-"+dateStr) || "{}");
+  popupNotes.value = saved.notes || "";
+  popupActivity.value = saved.activity || "";
 }
 
 saveBtn.addEventListener('click',()=>{
