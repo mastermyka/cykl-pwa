@@ -259,6 +259,62 @@ function addPeriod(){
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('service-worker.js').then(()=>console.log('Service Worker zarejestrowany'));
 }
+  // ======== EXPORT / IMPORT DANYCH ========
+
+// Funkcja eksportu danych (backup historii cykli + cytaty i porady)
+function exportAppData() {
+  const dataToExport = {
+    periods: periods,
+    quotesTipsData: quotesTipsData
+  };
+  const dataStr = JSON.stringify(dataToExport, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cycleAppData.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Funkcja importu danych z pliku JSON
+function importAppData(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(imported.periods) periods.length = 0, periods.push(...imported.periods);
+      if(imported.quotesTipsData) quotesTipsData = imported.quotesTipsData;
+      updateUI();
+      alert("Dane zostały zaimportowane poprawnie!");
+    } catch (err) {
+      console.error(err);
+      alert("Błąd przy imporcie danych JSON.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ======== DODAJ PRZYCISKI DO INTERFEJSU ========
+
+// Stworzymy kontener na koniec appki
+const container=document.querySelector('.container');
+const backupCard = document.createElement('div');
+backupCard.className = 'card';
+backupCard.innerHTML = `
+  <h2>Eksport / Import danych</h2>
+  <button onclick="exportAppData()">Eksportuj dane do JSON</button>
+  <label for="importFile" style="margin-top:0.5rem;font-weight:bold;">Importuj dane z JSON:</label>
+  <input type="file" id="importFile" accept=".json">
+`;
+container.appendChild(backupCard);
+
+// Obsługa input importu
+document.getElementById('importFile').addEventListener('change', function() {
+  if(this.files.length>0) importAppData(this.files[0]);
+});
+
 </script>
 </body>
 </html>
