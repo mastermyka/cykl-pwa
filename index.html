@@ -99,6 +99,8 @@
 <p><strong>Wellness:</strong></p>
 <div id="wellnessAccordion"></div>
 </div>
+<p><strong>Intymność:</strong></p>
+<div id="intimacyAccordion"></div>
 
 <!-- Kalendarz -->
 <div class="card">
@@ -179,6 +181,11 @@ fetch('quotesTips.json').then(r=>r.json()).then(data=>{ quotesTipsData = data; u
 let foodData={}, wellnessData={};
 fetch('foodTips.json').then(r=>r.json()).then(data=>{ foodData=data; updateUI(); });
 fetch('wellnessTips.json').then(r=>r.json()).then(data=>{ wellnessData=data; updateUI(); });
+let intimacyData = {};
+fetch('intimacyTips.json')
+  .then(r => r.json())
+  .then(data => { intimacyData = data; updateUI(); })
+  .catch(err => console.error('Nie udało się załadować tipów intymności:', err));
 
 function parseDate(str){return new Date(str+'T00:00:00');}
 function formatDate(date){return date.toISOString().split('T')[0];}
@@ -255,6 +262,7 @@ function updateUI(){
   document.getElementById('nextPeriod').textContent=info.nextPeriod;
   createAccordion('foodAccordion', foodData[info.phase]);
   createAccordion('wellnessAccordion', wellnessData[info.phase]);
+  createAccordion('intimacyAccordion', intimacyData[info.phase]);
   document.getElementById('dailyQuote').textContent=info.quote;
   document.getElementById('dailyTip').textContent=info.wellnessTip;
   updateHistory();
@@ -281,6 +289,7 @@ function showDayModal(date, phaseClass){
   document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
   createAccordion('modalFood', foodData[phase]);
   createAccordion('modalWellness', wellnessData[phase]);
+  createAccordion('modalIntimacy', intimacyData[phase]);
   modal.style.display='flex';
 }
 document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
