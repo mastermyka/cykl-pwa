@@ -3,24 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twój Cykl Kobiecy - PWA</title>
+<title>Cykl Kobiecy - PWA</title>
 <style>
   body { font-family: Arial, sans-serif; margin:0; padding:0; background:#fff; color:#333;}
   header { background:#ff8da1; color:#fff; padding:15px; text-align:center; font-size:1.5em;}
   #quote, #wellness { margin:15px; font-size:1.2em; text-align:center;}
   #calendar { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; margin:15px;}
-  .day { border:1px solid #ccc; padding:10px; text-align:center; cursor:pointer; user-select:none; border-radius:5px;}
+  .day { border:1px solid #ccc; padding:10px; text-align:center; cursor:pointer; user-select:none; }
   .menstruation { background:#ffb3b3; }
   .follicular { background:#ffd9b3; }
   .ovulation { background:#b3ffc6; }
   .luteal { background:#b3d9ff; }
   /* Popup */
-  #popup { position:fixed; top:0; left:0; width:100%; height:100%; display:none; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; flex-direction:column; z-index:1000;}
-  #popupContent { background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px; box-shadow:0 4px 8px rgba(0,0,0,0.2);}
+  #popup {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    display:none;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+  }
+  #popupContent {
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    width:90%;
+    max-width:400px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
   #popupContent h3 { margin-top:0; }
   #popupContent label { display:block; margin-top:10px; }
-  #popupContent textarea { width:100%; height:60px; margin-top:5px; }
-  #popupContent select { width:100%; padding:5px; margin-top:5px; }
+  #popupContent textarea { width:100%; height:60px; }
+  #popupContent select { width:100%; padding:5px; }
   #popupContent button { margin-top:10px; padding:10px; width:48%; border:none; border-radius:5px; cursor:pointer; }
   #popupContent button#saveBtn { background:#4CAF50; color:#fff; }
   #popupContent button#closeBtn { background:#f44336; color:#fff; }
@@ -72,107 +91,6 @@ const quotes = [
 "Zmiana zaczyna się od oddechu.",
 "Zasługujesz na odpoczynek.",
 "Twoje ciało nie jest Twoim wrogiem – to Twój dom.",
-"Każdy cykl przynosi nową energię.",
-"Czasem siła to po prostu przetrwać dzień.",
-"Zatrzymaj się. Oddychaj. Wszystko jest dobrze.",
-"Masz prawo do spokoju i ciszy.",
-"Miłość do siebie to nie egoizm, to odwaga.",
-"Twoje ciało jest mądre – zaufaj mu.",
-"Nie porównuj swojego rytmu do innych.",
-"To, co czujesz, jest ważne.",
-"Zadbaj o siebie tak, jak o ukochaną osobę.",
-"Jesteś częścią natury – i tak jak ona, masz swoje pory roku.",
-"Hormony to nie przeszkoda – to Twój rytm.",
-"Jutro też jest dzień.",
-"Nie bój się zwolnić tempa.",
-"Twoja siła tkwi w łagodności.",
-"Każdy etap cyklu to dar, nie wyzwanie.",
-"Poczuj wdzięczność za to, że jesteś.",
-"Twoje ciało nie musi być produktywne, żeby być piękne.",
-"Zmienność to część kobiecej natury.",
-"Dziś wybieram spokój.",
-"Nie wszystko musisz mieć pod kontrolą.",
-"Pozwól sobie na odpoczynek – to też działanie.",
-"Twoja wartość nie zależy od energii, którą dziś masz.",
-"Zaufaj procesowi.",
-"Równowaga to sztuka codziennych małych decyzji.",
-"Czasem cisza mówi więcej niż tysiąc słów.",
-"W Twojej delikatności jest ogromna siła.",
-"Nie musisz nic udowadniać.",
-"Każdy dzień przynosi nową szansę na spokój.",
-"Bądź dla siebie dobra.",
-"Masz prawo być zmęczona – to część bycia człowiekiem.",
-"Uważność zmienia sposób, w jaki odbierasz świat.",
-"Każdy oddech to szansa na reset.",
-"Daj sobie prawo do małych przyjemności.",
-"Twoja energia ma swoje naturalne wzloty i spadki.",
-"Śmiech to lekarstwo dla duszy.",
-"Nie oceniaj siebie zbyt surowo.",
-"Odpuść to, czego nie możesz zmienić.",
-"Codzienny rytuał może dać spokój.",
-"Twoje potrzeby są ważne.",
-"Zrób coś miłego dla swojego ciała.",
-"Obserwuj zmiany w sobie z ciekawością.",
-"Każdy dzień to nowa lekcja.",
-"Ciało i umysł potrzebują równowagi.",
-"Nie bój się słuchać intuicji.",
-"Akceptacja siebie to pierwszy krok do szczęścia.",
-"Twoja obecność jest wystarczająca.",
-"Zasługujesz na troskę i uwagę.",
-"Nie spiesz się, życie nie ucieka.",
-"Każda emocja jest dopuszczalna.",
-"Nie musisz zawsze być w pełni gotowa.",
-"Twój rytm jest unikalny.",
-"Codziennie ucz się czegoś o sobie.",
-"Twoja siła tkwi w autentyczności.",
-"Pozwól sobie na chwilę oddechu.",
-"Cisza daje odpowiedzi, których nie daje hałas.",
-"Nie musisz mieć planu na wszystko.",
-"Doceniaj małe kroki.",
-"Zrób dziś coś, co sprawia Ci radość.",
-"Twoja intuicja prowadzi Cię najlepiej.",
-"Nie oceniaj swojego dnia zbyt surowo.",
-"Każdy etap życia ma swoje znaczenie.",
-"Twoje ciało zasługuje na troskę.",
-"Nie porównuj się do innych kobiet.",
-"Twój czas jest cenny – dbaj o niego.",
-"Nie musisz być produktywna cały czas.",
-"Małe zwycięstwa też są ważne.",
-"Twoje granice są ważne.",
-"Nie bój się prosić o pomoc.",
-"Świadome oddechy uspokajają umysł.",
-"Zadbaj o swoje emocje tak samo jak o ciało.",
-"Twoje potrzeby są ważniejsze niż opinie innych.",
-"Nie spiesz się, każdy rytm ma sens.",
-"Ciało i umysł potrzebują odpoczynku.",
-"Akceptacja siebie to najlepszy prezent.",
-"Pozwól sobie na małe przyjemności.",
-"Każdy dzień to szansa na spokój.",
-"Twoja siła tkwi w cierpliwości.",
-"Nie musisz być idealna, żeby być szczęśliwa.",
-"Zasługujesz na troskę i miłość.",
-"Twoja energia ma swoje naturalne granice.",
-"Uważność pozwala lepiej czuć ciało.",
-"Każda emocja ma prawo się pojawić.",
-"Nie oceniaj swojego rytmu za surowo.",
-"Twoja obecność jest wystarczająca.",
-"Zaufaj procesowi swojego ciała.",
-"Równowaga to codzienna praktyka.",
-"Twój spokój ma znaczenie.",
-"Zrób dziś coś, co daje Ci radość.",
-"Ciało wie lepiej niż myślisz.",
-"Nie musisz kontrolować wszystkiego.",
-"Akceptacja siebie daje wolność.",
-"Twoja siła tkwi w delikatności.",
-"Pozwól sobie na odpoczynek dzisiaj.",
-"Codziennie ucz się czegoś o sobie.",
-"Twoje emocje są naturalne i ważne.",
-"Nie porównuj swojego rytmu z innymi.",
-"Świadome chwile dają energię.",
-"Małe kroki prowadzą do wielkich zmian.",
-"Twoja obecność jest Twoją mocą.",
-"Nie oceniaj się za surowo – jesteś wystarczająca.",
-"Zasługujesz na spokój i troskę."
 ];
 
 const wellnessTips = [
@@ -181,112 +99,7 @@ const wellnessTips = [
 "Rozciągnij ramiona i plecy 🧘‍♀️",
 "Poświęć 10 minut na relaks 💕",
 "Zjedz coś zielonego 🥗",
-"Zrób krótki spacer na świeżym powietrzu 🚶‍♀️",
-"Posłuchaj ulubionej muzyki 🎶",
-"Zrób herbatę i chwilę odpocznij ☕",
-"Zapisz 3 rzeczy, za które jesteś wdzięczna ✍️",
-"Zrób mini-meditację 5 minut 🪷",
-"Odłóż telefon na godzinę 📵",
-"Zrób coś kreatywnego 🎨",
-"Poćwicz uważność przy jednej czynności 🧘",
-"Zadbaj o nawodnienie 💦",
-"Zjedz pożywne śniadanie 🍲",
-"Uśmiechnij się do siebie w lustrze 🙂",
-"Wieczorem weź ciepłą kąpiel 🛁",
-"Wyjdź na balkon i oddychaj głęboko 🌤️",
-"Rozluźnij ramiona i kark 💆‍♀️",
-"Napisz komuś miłą wiadomość 💌",
-"Nie oceniaj siebie zbyt surowo 💫",
-"Odpuść to, czego nie możesz zmienić 🌸",
-"Stwórz sobie mały rytuał spokoju 🕯️",
-"Zadbaj o swoje potrzeby 🧡",
-"Obserwuj swoje ciało z ciekawością 👀",
-"Codziennie ucz się czegoś nowego o sobie 📖",
-"Poświęć 5 minut na świadome oddychanie 🌬️",
-"Zjedz owoce zamiast słodyczy 🍎",
-"Idź na krótki spacer w przerwie od pracy 🚶‍♀️",
-"Zrób notatkę o pozytywnych wydarzeniach dnia 📓",
-"Zrób 10 pompek lub kilka przysiadów 💪",
-"Zrelaksuj oczy – patrz w dal przez minutę 👁️",
-"Zrób dziennik wdzięczności 📝",
-"Zrób przerwę od ekranu – oczy odpoczną 👀",
-"Zaplanuj małą przyjemność na wieczór 🌙",
-"Oddychaj świadomie podczas codziennych czynności 🧘‍♀️",
-"Zrób krótki stretching przed snem 🌛",
-"Wypij ciepłą herbatę ziołową 🌿",
-"Zrób małą medytację wdzięczności 🙏",
-"Rozciągnij szyję i barki 💆‍♀️",
-"Zjedz zdrową przekąskę między posiłkami 🥜",
-"Poświęć chwilę na ulubioną aktywność fizyczną 🏃‍♀️",
-"Posłuchaj relaksującej muzyki 🎵",
-"Zrób sobie maseczkę lub peeling twarzy 🧖‍♀️",
-"Ułóż porządek na biurku lub w pokoju 🧹",
-"Poświęć czas na kreatywne pisanie ✍️",
-"Zjedz coś bogatego w witaminy 🍊",
-"Przypomnij sobie trzy pozytywne rzeczy z dnia 🌸",
-"Wyjdź na balkon i poczuj powietrze 🌬️",
-"Zrób krótką wizualizację spokoju 🧘",
-"Przeznacz 10 minut na świadome rozciąganie 🌿",
-"Zrób krótki spacer po schodach 🏃‍♀️",
-"Zapisz swój nastrój w dzienniku 🌸",
-"Zjedz lekki posiłek przed snem 🍵",
-"Zrób kilka głębokich oddechów przed rozpoczęciem pracy 🌬️",
-"Poświęć chwilę na wyciszenie umysłu 🧘‍♀️",
-"Zrób prosty trening rozciągający 🧎‍♀️",
-"Wypij szklankę wody z cytryną 🍋",
-"Zrób kilka przysiadów lub pajacyków 🏋️‍♀️",
-"Poświęć czas na spokojną lekturę 📖",
-"Zrób krótką medytację oddechową 🌿",
-"Zrelaksuj mięśnie karku i ramion 💆",
-"Zrób krótki spacer w ciągu dnia 🚶‍♀️",
-"Zjedz świeże owoce 🍓",
-"Poświęć chwilę na uważne jedzenie 🥗",
-"Zapisz swoje myśli w dzienniku ✍️",
-"Rozciągnij plecy i biodra 🧘",
-"Zrób małą przerwę od pracy przy komputerze 💻",
-"Poświęć chwilę na świadomy oddech 🌬️",
-"Zjedz zdrową przekąskę z orzechami 🥜",
-"Zrób krótką medytację relaksacyjną 🌿",
-"Poświęć czas na słuchanie ulubionej muzyki 🎵",
-"Zrelaksuj mięśnie nóg i stóp 🦶",
-"Zrób kilka pompek lub plank 🏋️‍♀️",
-"Zjedz lekki posiłek bogaty w białko 🍳",
-"Poświęć 10 minut na spacer na świeżym powietrzu 🚶",
-"Zrób małą wizualizację swojego spokoju 🧘‍♀️",
-"Wypij ciepłą herbatę ziołową przed snem 🍵",
-"Rozciągnij ręce, barki i szyję 💆‍♀️",
-"Poświęć chwilę na medytację wdzięczności 🙏",
-"Zrób krótką serię przysiadów lub rozgrzewki 🏋️",
-"Zjedz coś świeżego i pełnowartościowego 🥗",
-"Poświęć chwilę na świadomy oddech 🌬️",
-"Zapisz swoje emocje w dzienniku ✍️",
-"Rozciągnij nogi i plecy przed snem 🧘‍♀️",
-"Zrób krótki spacer dla relaksu 🚶",
-"Poświęć chwilę na słuchanie przyjemnych dźwięków 🎵",
-"Zrób małą aktywność fizyczną w ciągu dnia 🏃‍♀️",
-"Zjedz coś bogatego w witaminy i minerały 🍊",
-"Poświęć czas na swoje hobby lub pasję 🎨",
-"Zrelaksuj oczy i odwróć wzrok od ekranu 👀",
-"Zrób 5 minutowy mini-meditation 🌿",
-"Poświęć chwilę na uważne mycie rąk lub picie wody 💧",
-"Zrób krótką wizualizację swojego dnia 🌸",
-"Rozciągnij ręce i barki w ciągu dnia 💆‍♀️",
-"Poświęć czas na słuchanie muzyki, która uspokaja 🎶",
-"Zrób krótką przerwę na oddech w pracy 🌬️",
-"Zjedz lekką przekąskę bogatą w białko 🥚",
-"Zrób kilka prostych ćwiczeń rozciągających 🧘‍♀️",
-"Poświęć chwilę na świadome picie wody 💧",
-"Zapisz 3 pozytywne myśli z dnia ✍️",
-"Rozciągnij plecy i kark przed snem 🛌",
-"Zrób krótki spacer na świeżym powietrzu 🚶‍♀️",
-"Poświęć chwilę na uważne jedzenie 🥗",
-"Zrób kilka głębokich oddechów i wycisz umysł 🌿",
-"Zrelaksuj stopy i nogi po całym dniu 👣",
-"Poświęć chwilę na krótką medytację relaksacyjną 🧘",
-"Zjedz coś świeżego i zdrowego 🍎",
-"Zrób krótki trening rozciągający przed snem 🏋️‍♀️"
 ];
-
 
 function showDailyQuote() {
   const d = new Date().toDateString();
@@ -355,6 +168,22 @@ function updateCalendar() {
   const month = today.getMonth();
   const firstDay = new Date(year, month,1);
   const lastDay = new Date(year, month+1,0);
+  // dodajemy nagłówki dni tygodnia
+  const days = ["Pn","Wt","Śr","Cz","Pt","Sb","Nd"];
+  for(let d of days){
+    const headerDiv = document.createElement("div");
+    headerDiv.textContent = d;
+    headerDiv.style.fontWeight = "bold";
+    headerDiv.style.textAlign = "center";
+    calendarDiv.appendChild(headerDiv);
+  }
+  // puste dni na początku miesiąca
+  const startWeekDay = (firstDay.getDay()+6)%7; // przesunięcie Pn=0
+  for(let i=0;i<startWeekDay;i++){
+    const emptyDiv = document.createElement("div");
+    calendarDiv.appendChild(emptyDiv);
+  }
+  // dni miesiąca
   for(let i=1;i<=lastDay.getDate();i++){
     const dayDate = new Date(year,month,i);
     const phaseObj = getPhase(dayDate);
@@ -383,9 +212,9 @@ function openPopup(dateStr) {
   popupDate.textContent = dateStr;
   const phaseObj = getPhase(dateStr);
   popupPhase.textContent = phaseObj.label;
-  const saved = JSON.parse(localStorage.getItem("day-"+dateStr) || "{}");
-  popupNotes.value = saved.notes || "";
-  popupActivity.value = saved.activity || "";
+  const saved = JSON.parse(localStorage.getItem("day-"+dateStr)||"{}");
+  popupNotes.value = saved.notes||"";
+  popupActivity.value = saved.activity||"";
 }
 
 saveBtn.addEventListener('click',()=>{
