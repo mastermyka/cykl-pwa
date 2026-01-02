@@ -3,153 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twój Cykl - Asystent Kobiecy</title>
-<link rel="manifest" href="manifest.json">
-
-<!-- iOS PWA ikona -->
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+<title>Cykl Kobiecy - PWA</title>
 <style>
-:root {
-  --bg: #fafafa; --text: #333; --card: #fff;
-  --accent: #ff6f61; --accent2: #ff8a80;
-}
-[data-theme='dark'] {
-  --bg: #121212; --text: #f5f5f5; --card: #1e1e1e;
-  --accent: #ff6f61; --accent2: #ff8a80;
-}
-body {
-  font-family:'Helvetica Neue',Arial,sans-serif; margin:0;
-  background: var(--bg); color: var(--text);
-  transition: background .3s, color .3s;
-}
-header {
-  background: linear-gradient(90deg,#ff7a7a,#ff5e62);
-  color: white; padding: 1.5rem; text-align: center;
-  position: relative;
-}
-.theme-toggle {
-  position: absolute; right: 1rem; top: 1rem;
-  background: rgba(255,255,255,0.2); border: none;
-  border-radius: 50%; width: 36px; height: 36px;
-  color: white; font-size: 18px; cursor: pointer;
-}
-.container { padding:1rem; max-width:600px; margin:auto; }
-.card {
-  background: var(--card); border-radius:16px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  padding:1rem; margin-bottom:1rem;
-  transition: background .3s;
-}
-.phase { padding:1rem; border-radius:12px; color:white; font-weight:bold; text-align:center; }
-.menstruacja{background:#ff4d6d;} .folikularna{background:#6fcf97;}
-.owulacja{background:#56ccf2;} .lutealna{background:#bb6bd9;}
-button {
-  padding:0.7rem 1.2rem;margin-top:1rem;background:var(--accent);
-  color:white;border:none;border-radius:10px;cursor:pointer;width:100%;font-weight:bold;
-}
-button:hover { background: var(--accent2); }
-input,select,textarea {
-  padding:0.5rem;width:100%;border-radius:8px;border:1px solid #ddd;margin-top:0.25rem;
-}
-table{width:100%;border-collapse:collapse;margin-top:0.5rem;}
-th,td{padding:0.5rem;border:1px solid #ddd;text-align:center;}
-th{background:#f0f0f0;}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:1rem;}
-.day{padding:8px;border-radius:8px;text-align:center;font-size:0.85rem;cursor:pointer;}
-.menstruacja-day{background:#ff4d6d;color:white;} .folikularna-day{background:#6fcf97;color:white;}
-.owulacja-day{background:#56ccf2;color:white;} .lutealna-day{background:#bb6bd9;color:white;}
-.quote{font-style:italic;text-align:center;color:#666;margin-top:0.5rem;}
-.widget{background:var(--card);border-left:5px solid var(--accent);padding:0.75rem;border-radius:10px;margin-bottom:1rem;}
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#fff; color:#333;}
+  header { background:#ff8da1; color:#fff; padding:15px; text-align:center; font-size:1.5em;}
+  #quote, #wellness { margin:15px; font-size:1.2em; text-align:center;}
+  #calendar { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; margin:15px;}
+  .day { border:1px solid #ccc; padding:10px; text-align:center; cursor:pointer; user-select:none; }
+  .menstruation { background:#ffb3b3; }
+  .follicular { background:#ffd9b3; }
+  .ovulation { background:#b3ffc6; }
+  .luteal { background:#b3d9ff; }
+  /* Popup */
+  #popup { position:fixed; top:0; left:0; width:100%; height:100%; display:none; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+  #popupContent { background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px; }
+  #popupContent h3 { margin-top:0; }
+  #popupContent label { display:block; margin-top:10px; }
+  #popupContent textarea { width:100%; height:60px; }
+  #popupContent select { width:100%; padding:5px; }
+  #popupContent button { margin-top:10px; padding:10px; width:48%; }
 </style>
 </head>
 <body>
-<header>
-<h1>Twój Cykl – Asystent Kobiecy</h1>
-<button class="theme-toggle" onclick="toggleTheme()">🌗</button>
-</header>
 
-<div class="container">
+<header>Twój Cykl Kobiecy</header>
 
-<!-- Cytat i rada dnia -->
-<div class="widget">
-  <h3>💬 Cytat dnia</h3>
-  <p id="dailyQuote" class="quote"></p>
-</div>
-<div class="widget">
-  <h3>🌿 Dzisiejsza rada</h3>
-  <p id="dailyTip"></p>
-</div>
+<div id="quote"></div>
+<div id="wellness"></div>
 
-<!-- Faza -->
-<div class="card">
-<h2>Aktualna faza cyklu</h2>
-<div id="currentPhase" class="phase"></div>
-<p><strong>Dzień cyklu:</strong> <span id="cycleDay"></span></p>
-<p><strong>Owulacja:</strong> <span id="ovulationDate"></span></p>
-<p><strong>Dni płodne:</strong> <span id="fertileDays"></span></p>
-<p><strong>Następny okres:</strong> <span id="nextPeriod"></span></p>
-</div>
+<div id="calendar"></div>
 
-<!-- Rekomendacje -->
-<div class="card tips">
-<h2>Rekomendacje</h2>
-<p><strong>Żywienie:</strong></p><ul id="foodList"></ul>
-<p><strong>Trening:</strong></p><ul id="exerciseList"></ul>
-<p><strong>Samopoczucie:</strong> <span id="mood"></span></p>
-</div>
-
-<!-- Kalendarz -->
-<div class="card">
-<h2>Kalendarz ostatniego cyklu</h2>
-<div id="calendar" class="calendar"></div>
-</div>
-
-<!-- Analiza -->
-<div class="card">
-<h2>Analiza cyklu</h2>
-<p>Średnia długość cyklu: <span id="avgCycle"></span> dni</p>
-<p>Średnia długość krwawienia: <span id="avgBleeding"></span> dni</p>
-<p>Regularność: <span id="cycleVariation"></span></p>
-</div>
-
-<!-- Dziennik -->
-<div class="card">
-<h2>Dziennik samopoczucia</h2>
-<label for="moodSelect">Nastrój:</label>
-<select id="moodSelect">
-  <option value="">Wybierz nastrój</option>
-  <option>😊 Szczęśliwa</option><option>😴 Zmęczona</option>
-  <option>😣 Drażliwa</option><option>😌 Spokojna</option><option>🤕 Ból głowy</option>
-</select>
-<label for="symptoms">Objawy:</label>
-<textarea id="symptoms" placeholder="np. bóle brzucha, senność..."></textarea>
-<button onclick="saveMood()">Zapisz</button>
-<div id="moodHistory"></div>
-</div>
-
-<!-- Historia -->
-<div class="card">
-<h2>Historia cykli</h2>
-<table><thead><tr><th>Początek</th><th>Koniec</th><th>Długość</th></tr></thead>
-<tbody id="historyTable"></tbody></table>
-</div>
-
-<!-- Dodaj okres -->
-<div class="card">
-<h2>Dodaj nowy okres</h2>
-<label>Początek:</label><input type="date" id="startDate">
-<label>Koniec:</label><input type="date" id="endDate">
-<button onclick="addPeriod()">Dodaj</button>
-</div>
+<!-- Popup -->
+<div id="popup">
+  <div id="popupContent">
+    <h3>Dzień <span id="popupDate"></span></h3>
+    <div>Faza: <span id="popupPhase"></span></div>
+    <label>Objawy / Samopoczucie:</label>
+    <textarea id="popupNotes"></textarea>
+    <label>Aktywność fizyczna:</label>
+    <select id="popupActivity">
+      <option value="">Brak</option>
+      <option value="spacer">Spacer</option>
+      <option value="joga">Joga / Rozciąganie</option>
+      <option value="trening">Trening</option>
+      <option value="odpoczynek">Odpoczynek</option>
+    </select>
+    <div style="display:flex; justify-content:space-between;">
+      <button id="saveBtn">Zapisz</button>
+      <button id="closeBtn">Zamknij</button>
+    </div>
+  </div>
 </div>
 
 <script>
-// Dane cyklu
-const periods=[{start:'2025-01-07',end:'2025-01-10'},{start:'2025-01-30',end:'2025-02-02'},{start:'2025-02-24',end:'2025-02-27'},{start:'2025-03-23',end:'2025-03-26'},{start:'2025-04-16',end:'2025-04-19'},{start:'2025-05-12',end:'2025-05-15'},{start:'2025-06-04',end:'2025-06-07'},{start:'2025-06-28',end:'2025-07-01'},{start:'2025-07-24',end:'2025-07-27'},{start:'2025-08-18',end:'2025-08-21'},{start:'2025-09-12',end:'2025-09-15'},{start:'2025-10-08',end:'2025-10-11'},{start:'2025-10-30',end:'2025-11-02'},{start:'2025-11-25',end:'2025-11-28'},{start:'2025-12-19',end:'2025-12-22'}];
-const tips={menstruacja:{food:['Szpinak','Buraki','Smoothie malinowe'],exercise:['Spacer','Rozciąganie'],mood:'Odpocznij'},folikularna:{food:['Jajka','Owsianka','Sałatka z kurczakiem'],exercise:['Siłowy','Cardio'],mood:'Energia!'},owulacja:{food:['Owoce','Orzechy','Smoothie jagodowe'],exercise:['Taniec','Trening HIIT'],mood:'Pewność siebie'},lutealna:{food:['Czekolada','Banany','Magnez'],exercise:['Joga','Spacer'],mood:'Wahania nastroju'}};
+// --------------------------
+// Etap 2: Cytaty i wellness
+// --------------------------
 const quotes = [
 "Każdy dzień to nowy początek.",
 "Zaufaj swojemu ciału – ono wie, czego potrzebuje.",
@@ -376,61 +285,122 @@ const wellnessTips = [
 "Zrób krótki trening rozciągający przed snem 🏋️‍♀️"
 ];
 
-// Helpery
-const parseDate=s=>new Date(s+'T00:00:00');
-const formatDate=d=>d.toISOString().split('T')[0];
-const avgCycle=()=>Math.round(periods.slice(1).map((p,i)=>(parseDate(p.start)-parseDate(periods[i].start))/86400000).reduce((a,b)=>a+b)/ (periods.length-1));
-const avgBleeding=()=>Math.round(periods.map(p=>(parseDate(p.end)-parseDate(p.start))/86400000+1).reduce((a,b)=>a+b)/periods.length);
-const variation=()=>{const arr=periods.slice(1).map((p,i)=>(parseDate(p.start)-parseDate(periods[i].start))/86400000);const d=Math.max(...arr)-Math.min(...arr);return d<=2?'Regularny':'Zmienny o '+d+' dni';};
 
-// Fazy
-function getCycleInfo(){
- const avg=avgCycle();const last=parseDate(periods.at(-1).start);const today=new Date();
- const day=Math.floor((today-last)/86400000)+1;
- const ovDay=13;const fertileStart=new Date(last);fertileStart.setDate(fertileStart.getDate()+ovDay-5);
- const fertileEnd=new Date(last);fertileEnd.setDate(fertileEnd.getDate()+ovDay);
- const ovDate=new Date(last);ovDate.setDate(ovDate.getDate()+ovDay);
- const nextP=new Date(last);nextP.setDate(nextP.getDate()+avg);
- let phase='lutealna',cls='lutealna';if(day<=4){phase='menstruacja';cls='menstruacja';}else if(day<=ovDay-2){phase='folikularna';cls='folikularna';}else if(day===ovDay||day===ovDay-1){phase='owulacja';cls='owulacja';}
- return{phase,cls,day,ov:formatDate(ovDate),fert:[formatDate(fertileStart),formatDate(fertileEnd)],nextP:formatDate(nextP),tips:tips[phase]};
+function showDailyQuote() {
+  const d = new Date().toDateString();
+  let stored = JSON.parse(localStorage.getItem('quoteDay') || '{}');
+  if(stored.date !== d) {
+    stored = { date:d, text:quotes[Math.floor(Math.random()*quotes.length)] };
+    localStorage.setItem('quoteDay', JSON.stringify(stored));
+  }
+  document.getElementById('quote').textContent = stored.text;
 }
 
-// Update UI
-function updateUI(){
- const i=getCycleInfo();
- document.getElementById('currentPhase').textContent=i.phase.toUpperCase();
- document.getElementById('currentPhase').className='phase '+i.cls;
- document.getElementById('cycleDay').textContent=i.day;
- document.getElementById('ovulationDate').textContent=i.ov;
- document.getElementById('fertileDays').textContent=i.fert[0]+' – '+i.fert[1];
- document.getElementById('nextPeriod').textContent=i.nextP;
- document.getElementById('avgCycle').textContent=avgCycle();
- document.getElementById('avgBleeding').textContent=avgBleeding();
- document.getElementById('cycleVariation').textContent=variation();
- document.getElementById('foodList').innerHTML=i.tips.food.map(f=>`<li>${f}</li>`).join('');
- document.getElementById('exerciseList').innerHTML=i.tips.exercise.map(e=>`<li>${e}</li>`).join('');
- document.getElementById('mood').textContent=i.tips.mood;
- updateCalendar();updateHistory();showMoodHistory();
+function showDailyWellness() {
+  const d = new Date().toDateString();
+  let stored = JSON.parse(localStorage.getItem('wellnessDay') || '{}');
+  if(stored.date !== d) {
+    stored = { date:d, text:wellnessTips[Math.floor(Math.random()*wellnessTips.length)] };
+    localStorage.setItem('wellnessDay', JSON.stringify(stored));
+  }
+  document.getElementById('wellness').textContent = stored.text;
 }
 
-// Kalendarz, historia, mood
-function updateCalendar(){const c=document.getElementById('calendar');c.innerHTML='';const last=parseDate(periods.at(-1).start);const avg=avgCycle();for(let i=0;i<avg;i++){const d=new Date(last);d.setDate(d.getDate()+i);let cls='lutealna-day';if(i<4)cls='menstruacja-day';else if(i<12)cls='folikularna-day';else if(i===12||i===11)cls='owulacja-day';c.innerHTML+=`<div class='day ${cls}' onclick='alert(\"${formatDate(d)}\")'>${d.getDate()}</div>`;}}
-function updateHistory(){const tb=document.getElementById('historyTable');tb.innerHTML='';periods.forEach(p=>{const len=(parseDate(p.end)-parseDate(p.start))/86400000+1;tb.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;});}
-function saveMood(){const m=moodSelect.value,s=symptoms.value;if(!m&&!s)return alert('Wypełnij dane');const all=JSON.parse(localStorage.getItem('moods')||'[]');all.push({date:formatDate(new Date()),mood:m,sym:s});localStorage.setItem('moods',JSON.stringify(all));moodSelect.value='';symptoms.value='';showMoodHistory();}
-function showMoodHistory(){const all=JSON.parse(localStorage.getItem('moods')||'[]');moodHistory.innerHTML='<h3>Ostatnie wpisy:</h3>'+all.slice(-5).reverse().map(e=>`<p><strong>${e.date}</strong>: ${e.mood} – ${e.sym}</p>`).join('');}
-function addPeriod(){const s=startDate.value,e=endDate.value;if(s&&e){periods.push({start:s,end:e});updateUI();alert('Dodano!');}}
+showDailyQuote();
+showDailyWellness();
 
-// Cytaty i rady
-function showDailyQuote(){const d=new Date().toDateString();let stored=JSON.parse(localStorage.getItem('quoteDay')||'{}');if(stored.date!==d){stored={date:d,text:quotes[Math.floor(Math.random()*quotes.length)]};localStorage.setItem('quoteDay',JSON.stringify(stored));}document.getElementById('dailyQuote').textContent=stored.text;}
-function showDailyTip(){const d=new Date().toDateString();let stored=JSON.parse(localStorage.getItem('tipDay')||'{}');if(stored.date!==d){stored={date:d,text:wellnessTips[Math.floor(Math.random()*wellnessTips.length)]};localStorage.setItem('tipDay',JSON.stringify(stored));}document.getElementById('dailyTip').textContent=stored.text;}
+// --------------------------
+// Etap 3: Interaktywny kalendarz
+// --------------------------
+const calendarDiv = document.getElementById('calendar');
 
-// Motyw
-function toggleTheme(){const current=document.documentElement.getAttribute('data-theme');const newTheme=current==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',newTheme);localStorage.setItem('theme',newTheme);}
-(function(){const userPref=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',userPref);})();
+const cycleData = [
+  // Wstaw swoje dane z początkami i końcami miesiączek
+  {start:"2025-01-07", end:"2025-01-10"},
+  {start:"2025-01-30", end:"2025-02-02"},
+  {start:"2025-02-24", end:"2025-02-27"},
+  {start:"2025-03-23", end:"2025-03-26"},
+  {start:"2025-04-16", end:"2025-04-19"},
+  {start:"2025-05-12", end:"2025-05-15"},
+  {start:"2025-06-04", end:"2025-06-07"},
+  {start:"2025-06-28", end:"2025-07-01"},
+  {start:"2025-07-24", end:"2025-07-27"},
+  {start:"2025-08-18", end:"2025-08-21"},
+  {start:"2025-09-12", end:"2025-09-15"},
+  {start:"2025-10-08", end:"2025-10-11"},
+  {start:"2025-10-30", end:"2025-11-02"},
+  {start:"2025-11-25", end:"2025-11-28"},
+  {start:"2025-12-19", end:"2025-12-22"},
+];
 
-updateUI();showDailyQuote();showDailyTip();
+// Funkcja do określania fazy dnia
+function getPhase(date) {
+  const d = new Date(date);
+  // Dni menstruacji
+  for(const c of cycleData){
+    const start = new Date(c.start);
+    const end = new Date(c.end);
+    if(d>=start && d<=end) return {phase:"menstruation", label:"Menstruacja"};
+  }
+  // Przybliżone fazy (dla przykładu, 14 dni cyklu)
+  const lastStart = new Date(cycleData[cycleData.length-1].start);
+  const diff = Math.floor((d-lastStart)/86400000) % 28;
+  if(diff>=0 && diff<6) return {phase:"follicular", label:"Faza folikularna"};
+  if(diff>=6 && diff<14) return {phase:"ovulation", label:"Owulacja"};
+  return {phase:"luteal", label:"Faza lutealna"};
+}
 
-if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');
+// Tworzenie kalendarza (np. miesiąc bieżący)
+function updateCalendar() {
+  calendarDiv.innerHTML="";
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDay = new Date(year, month,1);
+  const lastDay = new Date(year, month+1,0);
+  for(let i=1;i<=lastDay.getDate();i++){
+    const dayDate = new Date(year,month,i);
+    const phaseObj = getPhase(dayDate);
+    const div = document.createElement('div');
+    div.className = "day "+phaseObj.phase;
+    div.textContent = i;
+    div.dataset.date = dayDate.toISOString().split('T')[0];
+    div.addEventListener('click',()=>openPopup(div.dataset.date));
+    calendarDiv.appendChild(div);
+  }
+}
+
+// --------------------------
+// Popup
+// --------------------------
+const popup = document.getElementById('popup');
+const popupDate = document.getElementById('popupDate');
+const popupPhase = document.getElementById('popupPhase');
+const popupNotes = document.getElementById('popupNotes');
+const popupActivity = document.getElementById('popupActivity');
+const saveBtn = document.getElementById('saveBtn');
+const closeBtn = document.getElementById('closeBtn');
+
+function openPopup(dateStr) {
+  popup.style.display="flex";
+  popupDate.textContent = dateStr;
+  const phaseObj = getPhase(dateStr);
+  popupPhase.textContent = phaseObj.label;
+  const saved = JSON.parse(localStorage.getItem("day-"+dateStr)||"{}");
+  popupNotes.value = saved.notes||"";
+  popupActivity.value = saved.activity||"";
+}
+
+saveBtn.addEventListener('click',()=>{
+  const dateStr = popupDate.textContent;
+  const data = {notes: popupNotes.value, activity: popupActivity.value};
+  localStorage.setItem("day-"+dateStr, JSON.stringify(data));
+  popup.style.display="none";
+});
+
+closeBtn.addEventListener('click',()=>{ popup.style.display="none"; });
+
+updateCalendar();
 </script>
 </body>
 </html>
