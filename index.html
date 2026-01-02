@@ -58,6 +58,20 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   font-size: 0.95rem;
 }
+  .calendar-nav button {
+  background: linear-gradient(90deg, #ff7a7a, #ff5e62);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin: 0.3rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.calendar-nav button:hover {
+  background: linear-gradient(90deg, #ff8a80, #ff6f61);
+}
+
 </style>
 </head>
 <body>
@@ -91,9 +105,14 @@
 </div>
 
 <div class="card">
-<h2>Kalendarz ostatniego cyklu</h2>
-<div id="calendar" class="calendar"></div>
+  <h2>Kalendarz cykli</h2>
+  <div id="calendar" class="calendar"></div>
+  <div class="calendar-nav" style="text-align:center; margin-top:10px;">
+    <button onclick="showPreviousCycle()">◀ Poprzedni cykl</button>
+    <button onclick="showNextCycle()">Następny cykl ▶</button>
+  </div>
 </div>
+
 
 <div class="card">
 <h2>Historia cykli</h2>
@@ -253,20 +272,50 @@ function updateHistory(){
     tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
   });
 }
-function updateCalendar(){
-  const calendar=document.getElementById('calendar'); calendar.innerHTML='';
-  const lastPeriod=parseDate(periods[periods.length-1].start);
-  const avgCycle=calculateAverageCycle(periods);
-  for(let i=0;i<avgCycle;i++){
-    const day=new Date(lastPeriod); day.setDate(day.getDate()+i);
-    let cls='';
-    if(i<4) cls='menstruacja-day';
-    else if(i<12) cls='folikularna-day';
-    else if(i===12||i===11) cls='owulacja-day';
-    else cls='lutealna-day';
-    calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayModal("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
+let currentCycleIndex = periods.length - 1;
+
+function showPreviousCycle() {
+  if (currentCycleIndex > 0) {
+    currentCycleIndex--;
+    updateCalendar();
   }
 }
+
+function showNextCycle() {
+  if (currentCycleIndex < periods.length - 1) {
+    currentCycleIndex++;
+    updateCalendar();
+  }
+}
+
+function updateCalendar() {
+  const calendar = document.getElementById('calendar');
+  calendar.innerHTML = '';
+
+  const period = periods[currentCycleIndex];
+  const avgCycle = calculateAverageCycle(periods);
+  const startDate = parseDate(period.start);
+
+  for (let i = 0; i < avgCycle; i++) {
+    const day = new Date(startDate);
+    day.setDate(day.getDate() + i);
+    let cls = '';
+    if (i < 4) cls = 'menstruacja-day';
+    else if (i < 12) cls = 'folikularna-day';
+    else if (i === 11 || i === 12) cls = 'owulacja-day';
+    else cls = 'lutealna-day';
+    calendar.innerHTML += `
+      <div class='day ${cls}' title='${formatDate(day)}'
+           onclick='showDayModal("${formatDate(day)}","${cls}")'>
+        ${day.getDate()}
+      </div>`;
+  }
+
+  // aktualizacja tytułu karty
+  document.querySelector(".card h2").textContent =
+    "Kalendarz cyklu: " + (currentCycleIndex + 1) + " z " + periods.length;
+}
+
 
 // --- Modal ---
 function showDayModal(date, phaseClass){
