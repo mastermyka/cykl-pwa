@@ -175,6 +175,7 @@
     <p id="modalPhase"></p>
     <div id="modalFood"></div>
     <div id="modalWellness"></div>
+    <div id="modalSymptoms"></div>
     <div id="modalIntimacy"></div>
   </div>
 </div>
@@ -291,6 +292,13 @@ document.getElementById('intimacyAccordion').innerHTML = `<div class="intimacy-t
   updateHistory();
   updateCalendar();
 }
+  function getCurrentPhaseClass() {
+  const info = getCycleInfo(periods);
+  return info.phase;
+}
+if (document.getElementById('dayModal').style.display === 'flex') {
+  showDayModal(formatDate(new Date()), getCurrentPhaseClass());
+}
 
 // --- Historia i kalendarz ---
 function updateHistory(){
@@ -359,7 +367,20 @@ function showDayModal(date, phaseClass){
 
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
-
+  // Objawy dnia
+const symptom = symptoms[date];
+const symptomsContainer = document.getElementById('modalSymptoms');
+symptomsContainer.innerHTML = ''; // wyczyść poprzednie
+if (symptom) {
+  symptomsContainer.innerHTML = `
+    <div class="symptom-card">
+      <h4>Objawy zapisane:</h4>
+      <p><strong>Ból:</strong> ${symptom.pain}/10</p>
+      <p><strong>Nastrój:</strong> ${symptom.mood}</p>
+      <p><strong>Energia:</strong> ${symptom.energy}/10</p>
+      <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
+    </div>`;
+}
   // Intimność
   const modalIntimacyTips = intimacyData[phase] || [];
   const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
