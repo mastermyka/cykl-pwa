@@ -38,6 +38,12 @@
   .daily-card p { margin:0.5rem 0; }
   .daily-card .quote { font-style:italic; font-size:1.2rem; }
   .daily-card .tip { font-weight:bold; font-size:1.1rem; }
+
+  /* Akordeony dla jedzenia i wellness */
+  .accordion-btn { width: 100%; text-align: left; padding: 0.5rem 1rem; font-weight: bold;
+                   background:#f0f0f0; border:none; border-radius:8px; margin-top:0.5rem; cursor:pointer; }
+  .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; margin: 0.25rem 0 0 0; padding-left:1rem; list-style-type: disc; }
+  .accordion-content.active { max-height: 500px; }
 </style>
 </head>
 <body>
@@ -46,7 +52,7 @@
 </header>
 <div class="container">
 
-<!-- Cytat dnia i Porada dnia na samej górze -->
+<!-- Cytat dnia i Porada dnia -->
 <div class="card daily-card">
   <p class="quote" id="dailyQuote"></p>
   <p class="tip" id="dailyTip"></p>
@@ -65,11 +71,12 @@
 <!-- Rekomendacje -->
 <div class="card tips">
 <h2>Rekomendacje</h2>
-<p><strong>Żywienie:</strong></p>
-<ul id="foodList"></ul>
-<p><strong>Trening:</strong></p>
-<ul id="exerciseList"></ul>
-<p><strong>Samopoczucie:</strong> <span id="mood"></span></p>
+
+<p><strong>Menu dzienne:</strong></p>
+<div id="foodAccordion"></div>
+
+<p><strong>Wellness:</strong></p>
+<div id="wellnessAccordion"></div>
 </div>
 
 <!-- Kalendarz -->
@@ -141,15 +148,17 @@ const tips = {
   }
 };
 
-// --- Wczytywanie cytatów i porad z JSON ---
+// --- Wczytywanie cytatów i tipów ---
 let quotesTipsData = {};
 fetch('quotesTips.json')
-  .then(response => response.json())
-  .then(data => {
-    quotesTipsData = data;
-    updateUI(); // aktualizacja UI po załadowaniu JSON
-  })
-  .catch(err => console.error('Nie udało się załadować cytatów i porad:', err));
+  .then(r => r.json())
+  .then(data => { quotesTipsData = data; updateUI(); })
+  .catch(err => console.error('Nie udało się załadować cytatów:', err));
+
+// --- Wczytywanie menu dziennego i wellness ---
+let foodData={}, wellnessData={};
+fetch('foodTips.json').then(r=>r.json()).then(data=>{ foodData = data; updateUI(); });
+fetch('wellnessTips.json').then(r=>r.json()).then(data=>{ wellnessData = data; updateUI(); });
 
 // --- Funkcje pomocnicze ---
 function parseDate(str){return new Date(str+'T00:00:00');}
@@ -224,8 +233,26 @@ function updateCalendar(){
   }
 }
 
+// --- Tworzenie akordeonów ---
+function createAccordion(containerId, data){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  for(const key in data){
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <button class="accordion-btn" onclick="this.nextElementSibling.classList.toggle('active')">${key}</button>
+      <ul class="accordion-content">
+        ${data[key].map(item=>`<li>${item}</li>`).join('')}
+      </ul>
+    `;
+    container.appendChild(div);
+  }
+}
+
 function updateUI(){
+  if(!quotesTipsData || !foodData || !wellnessData) return;
   const info=getCycleInfo(periods);
+
   const phaseDiv=document.getElementById('currentPhase'); 
   phaseDiv.textContent=info.phase.toUpperCase(); 
   phaseDiv.className=`phase ${info.phaseClass}`;
@@ -235,11 +262,8 @@ function updateUI(){
   document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
   document.getElementById('nextPeriod').textContent=info.nextPeriod;
 
-  const foodList=document.getElementById('foodList'); foodList.innerHTML='';
-  info.tips.food.forEach(f=>foodList.innerHTML+=`<li>${f}</li>`);
-  const exerciseList=document.getElementById('exerciseList'); exerciseList.innerHTML='';
-  info.tips.exercise.forEach(e=>exerciseList.innerHTML+=`<li>${e}</li>`);
-  document.getElementById('mood').textContent=info.tips.mood;
+  createAccordion('foodAccordion', foodData[info.phase]);
+  createAccordion('wellnessAccordion', wellnessData[info.phase]);
 
   document.getElementById('dailyQuote').textContent=info.quote;
   document.getElementById('dailyTip').textContent=info.wellnessTip;
@@ -259,62 +283,6 @@ function addPeriod(){
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('service-worker.js').then(()=>console.log('Service Worker zarejestrowany'));
 }
-  // ======== EXPORT / IMPORT DANYCH ========
-
-// Funkcja eksportu danych (backup historii cykli + cytaty i porady)
-function exportAppData() {
-  const dataToExport = {
-    periods: periods,
-    quotesTipsData: quotesTipsData
-  };
-  const dataStr = JSON.stringify(dataToExport, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "cycleAppData.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// Funkcja importu danych z pliku JSON
-function importAppData(file) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if(imported.periods) periods.length = 0, periods.push(...imported.periods);
-      if(imported.quotesTipsData) quotesTipsData = imported.quotesTipsData;
-      updateUI();
-      alert("Dane zostały zaimportowane poprawnie!");
-    } catch (err) {
-      console.error(err);
-      alert("Błąd przy imporcie danych JSON.");
-    }
-  };
-  reader.readAsText(file);
-}
-
-// ======== DODAJ PRZYCISKI DO INTERFEJSU ========
-
-// Stworzymy kontener na koniec appki
-const container=document.querySelector('.container');
-const backupCard = document.createElement('div');
-backupCard.className = 'card';
-backupCard.innerHTML = `
-  <h2>Eksport / Import danych</h2>
-  <button onclick="exportAppData()">Eksportuj dane do JSON</button>
-  <label for="importFile" style="margin-top:0.5rem;font-weight:bold;">Importuj dane z JSON:</label>
-  <input type="file" id="importFile" accept=".json">
-`;
-container.appendChild(backupCard);
-
-// Obsługa input importu
-document.getElementById('importFile').addEventListener('change', function() {
-  if(this.files.length>0) importAppData(this.files[0]);
-});
-
 </script>
 </body>
 </html>
