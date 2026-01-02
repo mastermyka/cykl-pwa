@@ -32,8 +32,12 @@
   .folikularna-day { background:#6fcf97; color:white; }
   .owulacja-day { background:#56ccf2; color:white; }
   .lutealna-day { background:#bb6bd9; color:white; }
-  #dailyQuote { font-style:italic; margin-top:0.5rem; }
-  #dailyTip { font-weight:bold; margin-top:0.5rem; }
+
+  /* Styl Cytatu i Porady dnia */
+  .daily-card { background: linear-gradient(135deg,#ff9a9e,#fad0c4); color:#fff; text-align:center; padding:2rem; font-size:1.1rem; line-height:1.5; margin-bottom:1rem; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+  .daily-card p { margin:0.5rem 0; }
+  .daily-card .quote { font-style:italic; font-size:1.2rem; }
+  .daily-card .tip { font-weight:bold; font-size:1.1rem; }
 </style>
 </head>
 <body>
@@ -41,6 +45,12 @@
 <h1>Twój Cykl - Asystent Kobiecy Rozbudowany</h1>
 </header>
 <div class="container">
+
+<!-- Cytat dnia i Porada dnia na samej górze -->
+<div class="card daily-card">
+  <p class="quote" id="dailyQuote"></p>
+  <p class="tip" id="dailyTip"></p>
+</div>
 
 <!-- Aktualna faza -->
 <div class="card">
@@ -50,9 +60,6 @@
 <p><strong>Owulacja:</strong> <span id="ovulationDate"></span></p>
 <p><strong>Dni płodne:</strong> <span id="fertileDays"></span></p>
 <p><strong>Następny okres:</strong> <span id="nextPeriod"></span></p>
-<!-- Cytat i porada -->
-<p id="dailyQuote"></p>
-<p id="dailyTip"></p>
 </div>
 
 <!-- Rekomendacje -->
@@ -93,6 +100,7 @@
 </div>
 
 <script>
+// dane cykli i rekomendacje (bez zmian)
 const periods = [
   { start: '2025-01-07', end: '2025-01-10' },
   { start: '2025-01-30', end: '2025-02-02' },
@@ -134,7 +142,6 @@ const tips = {
   }
 };
 
-// Cytaty i porady
 const quotes = {
   menstruacja: ["Odpoczynek to też aktywność.","Twoja siła tkwi w delikatności.","Pozwól sobie na regenerację."],
   folikularna: ["Każdy dzień jest nową możliwością.","Energia rodzi się z ruchu.","Wykorzystaj swój potencjał w pełni."],
@@ -220,6 +227,7 @@ function updateUI(){
   const exerciseList=document.getElementById('exerciseList'); exerciseList.innerHTML=''; info.tips.exercise.forEach(e=>exerciseList.innerHTML+=`<li>${e}</li>`);
   document.getElementById('mood').textContent=info.tips.mood;
 
+  // Cytat i porada dnia na górze
   document.getElementById('dailyQuote').textContent=info.quote;
   document.getElementById('dailyTip').textContent=info.wellnessTip;
   
