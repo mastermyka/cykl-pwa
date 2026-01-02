@@ -1,0 +1,22 @@
+{
+  "menstruacja": {
+    "Śniadanie": ["Owsianka z malinami i migdałami", "Herbata z imbirem"],
+    "Lunch": ["Zupa krem z dyni", "Grillowana pierś z kurczaka", "Sałatka z burakami i soczewicą"],
+    "Kolacja": ["Pełnoziarnisty chleb z pastą warzywną", "Sałatka z soczewicą", "Ciemna czekolada"]
+  },
+  "folikularna": {
+    "Śniadanie": ["Jajecznica z warzywami", "Owsianka z owocami"],
+    "Lunch": ["Sałatka z kurczakiem i awokado", "Kasza jaglana", "Zupa krem z marchwi"],
+    "Kolacja": ["Ryba pieczona z warzywami", "Sałatka grecka", "Grillowane warzywa"]
+  },
+  "owulacja": {
+    "Śniadanie": ["Smoothie z jagodami i bananem", "Jogurt z granolą"],
+    "Lunch": ["Sałatka z quinoa i warzywami", "Grillowana pierś z kurczaka"],
+    "Kolacja": ["Makaron pełnoziarnisty z warzywami", "Sałatka z orzechami", "Pieczony łosoś"]
+  },
+  "lutealna": {
+    "Śniadanie": ["Jogurt naturalny z owocami i siemieniem", "Owsianka z jabłkiem i cynamonem"],
+    "Lunch": ["Kasza gryczana z warzywami", "Pieczona ryba", "Sałatka z ciecierzycą i awokado"],
+    "Kolacja": ["Ciemna czekolada", "Sałatka z warzyw z oliwą", "Zupa krem z dyni"]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "menstruacja": {
+    "mood": ["Zmęczenie, potrzeba odpoczynku", "Wrażliwość emocjonalna – pozwól sobie na relaks"],
+    "mindfulness": ["10 min medytacji wieczorem", "Głębokie oddechy rano", "Ciepła kąpiel z olejkami"],
+    "energy": ["Delikatny spacer 20 min", "Unikaj intensywnych treningów"],
+    "mentalHealth": ["Pisz dziennik uczuć", "Czas dla siebie – książka lub muzyka"]
+  },
+  "folikularna": {
+    "mood": ["Dużo energii, wysoka motywacja", "Chęć do planowania i działania"],
+    "mindfulness": ["5 min medytacji rano", "Krótka joga przed pracą"],
+    "energy": ["Trening siłowy 40 min", "Cardio 30 min", "Wysiłek kreatywny np. rysunek"],
+    "mentalHealth": ["Zapisuj cele dnia", "Organizuj czas produktywnie"]
+  },
+  "owulacja": {
+    "mood": ["Pewność siebie, wysoki poziom libido", "Towarzyskość, chęć spotkań"],
+    "mindfulness": ["Świadome oddechy 5 min", "Krótka medytacja przed spotkaniami"],
+    "energy": ["Intensywny trening 45 min", "Taniec lub aerobik"],
+    "mentalHealth": ["Networking, kontakty społeczne", "Wyrażanie emocji w rozmowie"]
+  },
+  "lutealna": {
+    "mood": ["Wahania nastroju, PMS", "Irytacja i zmęczenie", "Skłonność do refleksji"],
+    "mindfulness": ["Joga 30 min", "Spacer w ciszy 20 min"],
+    "energy": ["Unikaj ciężkich treningów", "Lekki jogging lub stretching"],
+    "mentalHealth": ["Czas dla siebie", "Notuj emocje w dzienniku", "Relaksująca muzyka"]
+  }
+}
