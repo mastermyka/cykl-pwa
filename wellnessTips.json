@@ -1,26 +1,114 @@
 {
   "menstruacja": {
-    "mood": ["Zmęczenie, potrzeba odpoczynku", "Wrażliwość emocjonalna – pozwól sobie na relaks"],
-    "mindfulness": ["10 min medytacji wieczorem", "Głębokie oddechy rano", "Ciepła kąpiel z olejkami"],
-    "energy": ["Delikatny spacer 20 min", "Unikaj intensywnych treningów"],
-    "mentalHealth": ["Pisz dziennik uczuć", "Czas dla siebie – książka lub muzyka"]
+    "Ćwiczenia": [
+      "Lekki spacer 20–30 min",
+      "Delikatne rozciąganie całego ciała",
+      "Joga relaksacyjna 20 min",
+      "Ćwiczenia oddechowe",
+      "Spacer w parku",
+      "Rozciąganie nóg i pleców",
+      "Łagodne krążenia ramion",
+      "Medytacja 10 min",
+      "Masaż mięśni pleców",
+      "Rozciąganie bioder"
+    ],
+    "Sen i odpoczynek": [
+      "Drzemka 20 min",
+      "Wieczorna medytacja",
+      "Ciepła kąpiel przed snem",
+      "Unikanie ekranów na 1 h przed snem",
+      "Muzyka relaksacyjna"
+    ],
+    "Dodatkowe tipy": [
+      "Picie herbaty z rumianku",
+      "Ciepły okład na brzuch",
+      "Unikanie nadmiernego stresu",
+      "Delikatny automasaż stóp",
+      "Ograniczenie kofeiny"
+    ]
   },
   "folikularna": {
-    "mood": ["Dużo energii, wysoka motywacja", "Chęć do planowania i działania"],
-    "mindfulness": ["5 min medytacji rano", "Krótka joga przed pracą"],
-    "energy": ["Trening siłowy 40 min", "Cardio 30 min", "Wysiłek kreatywny np. rysunek"],
-    "mentalHealth": ["Zapisuj cele dnia", "Organizuj czas produktywnie"]
+    "Ćwiczenia": [
+      "Trening siłowy 40 min",
+      "Cardio 30 min",
+      "Pilates 30 min",
+      "Jazda na rowerze",
+      "Bieganie 20–30 min",
+      "Ćwiczenia z gumą oporową",
+      "Ćwiczenia core 20 min",
+      "Skakanie na skakance 10 min",
+      "Stretching dynamiczny",
+      "Spacer energetyzujący"
+    ],
+    "Relaks": [
+      "Medytacja 10–15 min",
+      "Spacer w naturze",
+      "Muzyka energetyzująca",
+      "Kąpiel aromaterapeutyczna",
+      "Pisanie dziennika"
+    ],
+    "Dodatkowe tipy": [
+      "Suplementacja witaminy D",
+      "Picie 2–3 l wody dziennie",
+      "Świeże owoce i warzywa",
+      "Unikanie przetworzonej żywności",
+      "Planowanie tygodnia"
+    ]
   },
   "owulacja": {
-    "mood": ["Pewność siebie, wysoki poziom libido", "Towarzyskość, chęć spotkań"],
-    "mindfulness": ["Świadome oddechy 5 min", "Krótka medytacja przed spotkaniami"],
-    "energy": ["Intensywny trening 45 min", "Taniec lub aerobik"],
-    "mentalHealth": ["Networking, kontakty społeczne", "Wyrażanie emocji w rozmowie"]
+    "Ćwiczenia": [
+      "Intensywny trening 45 min",
+      "Taniec lub aerobik",
+      "Trening interwałowy",
+      "Bieganie 30–40 min",
+      "Crossfit",
+      "Ćwiczenia na równowagę",
+      "Skakanie na skakance 15 min",
+      "Ćwiczenia core i plecy",
+      "Stretching dynamiczny",
+      "Trening z kettlebell"
+    ],
+    "Relaks": [
+      "Medytacja 10 min",
+      "Joga energetyzująca",
+      "Spacer po lesie",
+      "Sauna lub gorąca kąpiel",
+      "Pisanie dziennika wdzięczności"
+    ],
+    "Dodatkowe tipy": [
+      "Spożycie białka w każdym posiłku",
+      "Unikanie alkoholu",
+      "Zdrowe tłuszcze w diecie",
+      "Picie wody z cytryną",
+      "Organizacja zadań dnia"
+    ]
   },
   "lutealna": {
-    "mood": ["Wahania nastroju, PMS", "Irytacja i zmęczenie", "Skłonność do refleksji"],
-    "mindfulness": ["Joga 30 min", "Spacer w ciszy 20 min"],
-    "energy": ["Unikaj ciężkich treningów", "Lekki jogging lub stretching"],
-    "mentalHealth": ["Czas dla siebie", "Notuj emocje w dzienniku", "Relaksująca muzyka"]
+    "Ćwiczenia": [
+      "Joga 30 min",
+      "Spacery 30 min",
+      "Pilates 30 min",
+      "Delikatne ćwiczenia rozciągające",
+      "Ćwiczenia oddechowe",
+      "Pływanie rekreacyjne",
+      "Ćwiczenia core 20 min",
+      "Spacer energetyzujący",
+      "Masaż mięśni pleców",
+      "Rozciąganie bioder"
+    ],
+    "Relaks": [
+      "Medytacja 10–15 min",
+      "Ciepła kąpiel",
+      "Aromaterapia",
+      "Pisanie dziennika",
+      "Czytanie książki"
+    ],
+    "Dodatkowe tipy": [
+      "Spożycie magnezu",
+      "Herbata ziołowa",
+      "Unikanie stresu",
+      "Ograniczenie kofeiny",
+      "Sen 7–8 h"
+    ]
   }
 }
