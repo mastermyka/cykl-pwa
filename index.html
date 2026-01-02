@@ -296,9 +296,11 @@ document.getElementById('intimacyAccordion').innerHTML = `<div class="intimacy-t
   const info = getCycleInfo(periods);
   return info.phase;
 }
-if (document.getElementById('dayModal').style.display === 'flex') {
-  showDayModal(formatDate(new Date()), getCurrentPhaseClass());
+const today = formatDate(new Date());
+if (symptoms[today]) {
+  showDayModal(today, getCurrentPhaseClass());
 }
+
 
 // --- Historia i kalendarz ---
 function updateHistory(){
