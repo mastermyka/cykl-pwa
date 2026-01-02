@@ -287,6 +287,66 @@ document.getElementById('closeModal').addEventListener('click',()=>{document.get
 
 // Service Worker
 if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany'));}
+// --- LocalStorage ---
+function saveHistory(){
+  localStorage.setItem('cycleHistory', JSON.stringify(periods));
+}
+
+function loadHistory(){
+  const data = localStorage.getItem('cycleHistory');
+  if(data){
+    try{
+      const arr = JSON.parse(data);
+      if(Array.isArray(arr)) periods.splice(0, periods.length, ...arr);
+    }catch(e){ console.error('Błąd wczytywania historii:', e);}
+  }
+}
+
+// --- Eksport / Import JSON ---
+function exportHistory(){
+  const dataStr = JSON.stringify(periods, null, 2);
+  const blob = new Blob([dataStr], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cycleHistory.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importHistory(){
+  const file = document.getElementById('importFile').files[0];
+  if(!file) return alert('Wybierz plik JSON!');
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const arr = JSON.parse(e.target.result);
+      if(Array.isArray(arr)){
+        periods.splice(0, periods.length, ...arr);
+        saveHistory();
+        updateUI();
+        alert('Historia zaimportowana!');
+      }else alert('Niepoprawny format JSON!');
+    }catch(err){ alert('Błąd parsowania JSON'); }
+  };
+  reader.readAsText(file);
+}
+
+// --- Na starcie wczytanie historii ---
+loadHistory();
+updateUI();
+
+// Dodaj w addPeriod() też zapisywanie do localStorage
+function addPeriod(){
+  const start=document.getElementById('startDate').value;
+  const end=document.getElementById('endDate').value;
+  if(start && end){
+    periods.push({start,end});
+    saveHistory();
+    updateUI();
+    alert('Dodano okres!');
+  }else alert('Wprowadź obie daty.');
+}
 </script>
 </body>
 </html>
