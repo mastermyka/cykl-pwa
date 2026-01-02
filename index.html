@@ -336,17 +336,20 @@ function updateCalendar() {
   calendar.innerHTML = '';
 
   const period = periods[currentCycleIndex];
-  const avgCycle = calculateAverageCycle(periods);
+  const avgCycle = calculateAverageCycle(periods); // średnia długość cyklu
   const startDate = parseDate(period.start);
 
   for (let i = 0; i < avgCycle; i++) {
     const day = new Date(startDate);
     day.setDate(day.getDate() + i);
+
     let cls = '';
-    if (i < 4) cls = 'menstruacja-day';
-    else if (i < 12) cls = 'folikularna-day';
-    else if (i === 11 || i === 12) cls = 'owulacja-day';
+    const dayOfCycle = i + 1;
+    if (dayOfCycle <= 4) cls = 'menstruacja-day';
+    else if (dayOfCycle <= 12) cls = 'folikularna-day';
+    else if (dayOfCycle === 13 || dayOfCycle === 14) cls = 'owulacja-day';
     else cls = 'lutealna-day';
+
     calendar.innerHTML += `
       <div class='day ${cls}' title='${formatDate(day)}'
            onclick='showDayModal("${formatDate(day)}","${cls}")'>
@@ -357,6 +360,7 @@ function updateCalendar() {
   document.querySelector(".card h2").textContent =
     "Kalendarz cyklu: " + (currentCycleIndex + 1) + " z " + periods.length;
 }
+
 
 function showPreviousCycle() {
   if (currentCycleIndex > 0) { currentCycleIndex--; updateCalendar(); }
@@ -445,11 +449,22 @@ function updateUI(){
 // ===============================
 // --- FETCH JSON ---
 // ===============================
-fetch('quotesTips.json').then(r=>r.json()).then(d=>{ quotesTipsData=d; updateUI(); });
-fetch('foodTips.json').then(r=>r.json()).then(d=>{ foodData=d; updateUI(); });
-fetch('wellnessTips.json').then(r=>r.json()).then(d=>{ wellnessData=d; updateUI(); });
-fetch('intimacyTips.json').then(r=>r.json())
-.catch(err=>console.error('Nie udało się załadować tipów intymności:', err));
+// --- Wczytywanie wszystkich JSONów jednocześnie ---
+Promise.all([
+  fetch('quotesTips.json').then(r => r.json()),
+  fetch('foodTips.json').then(r => r.json()),
+  fetch('wellnessTips.json').then(r => r.json()),
+  fetch('intimacyTips.json').then(r => r.json())
+]).then(([quotes, food, wellness, intimacy]) => {
+  quotesTipsData = quotes;
+  foodData = food;
+  wellnessData = wellness;
+  intimacyData = intimacy;
+
+  loadHistory();    // wczytaj historię z localStorage
+  updateUI();       // aktualizacja całego UI
+  showDayModal(formatDate(new Date()), getCurrentPhaseClass()); // otwórz modal dzisiaj
+}).catch(err => console.error('Błąd wczytywania tipów:', err));
 
 // ===============================
 // --- SERVICE WORKER ---
