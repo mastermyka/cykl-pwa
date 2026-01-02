@@ -33,17 +33,22 @@
   .owulacja-day { background:#56ccf2; color:white; }
   .lutealna-day { background:#bb6bd9; color:white; }
 
-  /* Styl Cytatu i Porady dnia */
+  /* Cytat i Porada dnia */
   .daily-card { background: linear-gradient(135deg,#ff9a9e,#fad0c4); color:#fff; text-align:center; padding:2rem; font-size:1.1rem; line-height:1.5; margin-bottom:1rem; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
   .daily-card p { margin:0.5rem 0; }
   .daily-card .quote { font-style:italic; font-size:1.2rem; }
   .daily-card .tip { font-weight:bold; font-size:1.1rem; }
 
-  /* Akordeony dla jedzenia i wellness */
+  /* Akordeony jedzenie i wellness */
   .accordion-btn { width: 100%; text-align: left; padding: 0.5rem 1rem; font-weight: bold;
                    background:#f0f0f0; border:none; border-radius:8px; margin-top:0.5rem; cursor:pointer; }
   .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; margin: 0.25rem 0 0 0; padding-left:1rem; list-style-type: disc; }
   .accordion-content.active { max-height: 500px; }
+
+  /* Modal na dzień */
+  #dayModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center; }
+  #dayModal .modal-content { background:white; border-radius:16px; max-width:500px; width:90%; padding:1rem; position:relative; max-height:80vh; overflow-y:auto; }
+  #closeModal { position:absolute; top:10px; right:10px; background:#ff6f61; color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -71,10 +76,8 @@
 <!-- Rekomendacje -->
 <div class="card tips">
 <h2>Rekomendacje</h2>
-
 <p><strong>Menu dzienne:</strong></p>
 <div id="foodAccordion"></div>
-
 <p><strong>Wellness:</strong></p>
 <div id="wellnessAccordion"></div>
 </div>
@@ -106,6 +109,17 @@
 
 </div>
 
+<!-- Modal na kliknięcie w dzień -->
+<div id="dayModal">
+  <div class="modal-content">
+    <button id="closeModal">✕</button>
+    <h3 id="modalDate"></h3>
+    <p id="modalPhase"></p>
+    <div id="modalFood"></div>
+    <div id="modalWellness"></div>
+  </div>
+</div>
+
 <script>
 const periods = [
   { start: '2025-01-07', end: '2025-01-10' },
@@ -126,69 +140,36 @@ const periods = [
 ];
 
 const tips = {
-  menstruacja: {
-    food: ['Szpinak z jajkiem','Sałatka z burakami i soczewicą','Smoothie z malinami i bananem'],
-    exercise: ['Lekki spacer 30 min','Delikatne rozciąganie'],
-    mood: 'Zmęczenie, potrzeba odpoczynku'
-  },
-  folikularna: {
-    food: ['Jajka na miękko z warzywami','Owsianka z owocami','Sałatka z kurczakiem i awokado'],
-    exercise: ['Trening siłowy 40 min','Cardio 30 min'],
-    mood: 'Dużo energii, wysoka motywacja'
-  },
-  owulacja: {
-    food: ['Owoce sezonowe','Orzechy i migdały','Smoothie z jagodami'],
-    exercise: ['Intensywny trening 45 min','Taniec lub aerobik'],
-    mood: 'Pewność siebie, wysoki poziom libido'
-  },
-  lutealna: {
-    food: ['Ciemna czekolada','Banany','Produkty bogate w magnez'],
-    exercise: ['Joga 30 min','Spacery 30 min'],
-    mood: 'Wahania nastroju, PMS'
-  }
+  menstruacja: { food:['Szpinak z jajkiem','Sałatka z burakami','Smoothie malinowe'], exercise:['Lekki spacer','Rozciąganie'], mood:'Zmęczenie' },
+  folikularna: { food:['Jajka z warzywami','Owsianka','Sałatka z kurczakiem'], exercise:['Trening siłowy','Cardio'], mood:'Dużo energii' },
+  owulacja: { food:['Owoce sezonowe','Orzechy','Smoothie jagodowe'], exercise:['Intensywny trening','Taniec'], mood:'Pewność siebie' },
+  lutealna: { food:['Czekolada','Banany','Produkty bogate w magnez'], exercise:['Joga','Spacery'], mood:'Wahania nastroju' }
 };
 
-// --- Wczytywanie cytatów i tipów ---
 let quotesTipsData = {};
-fetch('quotesTips.json')
-  .then(r => r.json())
-  .then(data => { quotesTipsData = data; updateUI(); })
-  .catch(err => console.error('Nie udało się załadować cytatów:', err));
-
-// --- Wczytywanie menu dziennego i wellness ---
+fetch('quotesTips.json').then(r=>r.json()).then(data=>{ quotesTipsData = data; updateUI(); });
 let foodData={}, wellnessData={};
-fetch('foodTips.json').then(r=>r.json()).then(data=>{ foodData = data; updateUI(); });
-fetch('wellnessTips.json').then(r=>r.json()).then(data=>{ wellnessData = data; updateUI(); });
+fetch('foodTips.json').then(r=>r.json()).then(data=>{ foodData=data; updateUI(); });
+fetch('wellnessTips.json').then(r=>r.json()).then(data=>{ wellnessData=data; updateUI(); });
 
-// --- Funkcje pomocnicze ---
 function parseDate(str){return new Date(str+'T00:00:00');}
 function formatDate(date){return date.toISOString().split('T')[0];}
-function calculateAverageCycle(periods){
-  let total=0;
-  for(let i=1;i<periods.length;i++){
-    total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);
-  }
-  return Math.round(total/(periods.length-1));
-}
-
+function calculateAverageCycle(periods){let total=0; for(let i=1;i<periods.length;i++){total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);} return Math.round(total/(periods.length-1));}
 function getCycleInfo(periods){
   const avgCycle=calculateAverageCycle(periods);
   const lastPeriod=parseDate(periods[periods.length-1].start);
   const today=new Date();
   const dayOfCycle=Math.floor((today-lastPeriod)/(1000*60*60*24))+1;
   const ovulationDay=13;
-
   const fertileStart=new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate()+ovulationDay-5);
   const fertileEnd=new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate()+ovulationDay);
   const ovulationDate=new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate()+ovulationDay);
   const nextPeriod=new Date(lastPeriod); nextPeriod.setDate(nextPeriod.getDate()+avgCycle);
-
   let phase='',phaseClass='';
   if(dayOfCycle<=4){phase='menstruacja';phaseClass='menstruacja';}
   else if(dayOfCycle<=ovulationDay-2){phase='folikularna';phaseClass='folikularna';}
   else if(dayOfCycle===ovulationDay||dayOfCycle===ovulationDay-1){phase='owulacja';phaseClass='owulacja';}
   else{phase='lutealna';phaseClass='lutealna';}
-
   return {
     phase,phaseClass,dayOfCycle,
     fertileDays:[formatDate(fertileStart),formatDate(fertileEnd)],
@@ -208,16 +189,6 @@ function updateHistory(){
   });
 }
 
-function showDayDetails(date, phaseClass){
-  let phase='';
-  if(phaseClass.includes('menstruacja')) phase='menstruacja';
-  else if(phaseClass.includes('folikularna')) phase='folikularna';
-  else if(phaseClass.includes('owulacja')) phase='owulacja';
-  else phase='lutealna';
-  const dayTips = tips[phase];
-  alert(`${date}\nFaza: ${phase}\nŻywienie: ${dayTips.food.join(', ')}\nTrening: ${dayTips.exercise.join(', ')}\nSamopoczucie: ${dayTips.mood}`);
-}
-
 function updateCalendar(){
   const calendar=document.getElementById('calendar'); calendar.innerHTML='';
   const lastPeriod=parseDate(periods[periods.length-1].start);
@@ -229,22 +200,17 @@ function updateCalendar(){
     else if(i<12) cls='folikularna-day';
     else if(i===12||i===11) cls='owulacja-day';
     else cls='lutealna-day';
-    calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayDetails("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
+    calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayModal("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
   }
 }
 
-// --- Tworzenie akordeonów ---
+// Akordeon
 function createAccordion(containerId, data){
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
+  const container=document.getElementById(containerId); container.innerHTML='';
   for(const key in data){
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <button class="accordion-btn" onclick="this.nextElementSibling.classList.toggle('active')">${key}</button>
-      <ul class="accordion-content">
-        ${data[key].map(item=>`<li>${item}</li>`).join('')}
-      </ul>
-    `;
+    const div=document.createElement('div');
+    div.innerHTML=`<button class="accordion-btn" onclick="this.nextElementSibling.classList.toggle('active')">${key}</button>
+      <ul class="accordion-content">${data[key].map(item=>`<li>${item}</li>`).join('')}</ul>`;
     container.appendChild(div);
   }
 }
@@ -252,23 +218,18 @@ function createAccordion(containerId, data){
 function updateUI(){
   if(!quotesTipsData || !foodData || !wellnessData) return;
   const info=getCycleInfo(periods);
-
   const phaseDiv=document.getElementById('currentPhase'); 
   phaseDiv.textContent=info.phase.toUpperCase(); 
   phaseDiv.className=`phase ${info.phaseClass}`;
-
   document.getElementById('cycleDay').textContent=info.dayOfCycle;
   document.getElementById('ovulationDate').textContent=info.ovulationDate;
   document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
   document.getElementById('nextPeriod').textContent=info.nextPeriod;
-
   createAccordion('foodAccordion', foodData[info.phase]);
   createAccordion('wellnessAccordion', wellnessData[info.phase]);
-
   document.getElementById('dailyQuote').textContent=info.quote;
   document.getElementById('dailyTip').textContent=info.wellnessTip;
-
-  updateHistory(); 
+  updateHistory();
   updateCalendar();
 }
 
@@ -279,10 +240,25 @@ function addPeriod(){
   else alert('Wprowadź obie daty.');
 }
 
-// --- Service Worker ---
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js').then(()=>console.log('Service Worker zarejestrowany'));
+// --- Modal ---
+function showDayModal(date, phaseClass){
+  const info=getCycleInfo(periods);
+  let phase='';
+  if(phaseClass.includes('menstruacja')) phase='menstruacja';
+  else if(phaseClass.includes('folikularna')) phase='folikularna';
+  else if(phaseClass.includes('owulacja')) phase='owulacja';
+  else phase='lutealna';
+  const modal=document.getElementById('dayModal');
+  document.getElementById('modalDate').textContent=date;
+  document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
+  createAccordion('modalFood', foodData[phase]);
+  createAccordion('modalWellness', wellnessData[phase]);
+  modal.style.display='flex';
 }
+document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
+
+// Service Worker
+if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany'));}
 </script>
 </body>
 </html>
