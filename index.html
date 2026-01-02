@@ -142,19 +142,6 @@ const tips = {
   }
 };
 
-const quotes = {
-  menstruacja: ["Odpoczynek to też aktywność.","Twoja siła tkwi w delikatności.","Pozwól sobie na regenerację."],
-  folikularna: ["Każdy dzień jest nową możliwością.","Energia rodzi się z ruchu.","Wykorzystaj swój potencjał w pełni."],
-  owulacja: ["Pewność siebie przyciąga ludzi.","Świetny czas na inicjowanie projektów.","Twoja kreatywność kwitnie."],
-  lutealna: ["Zadbaj o siebie i swoje emocje.","Wrażliwość to Twój supermocny zasób.","Małe kroki dziś, duże efekty jutro."]
-};
-const wellnessTips = {
-  menstruacja: ["Zrób ciepłą kąpiel relaksacyjną.","Włącz lekkie ćwiczenia rozciągające.","Pij herbaty ziołowe uspokajające."],
-  folikularna: ["Spróbuj nowego treningu siłowego.","Planuj kreatywne projekty.","Jedz lekkie i energetyczne posiłki."],
-  owulacja: ["Spotkaj się z przyjaciółmi lub rodziną.","Eksperymentuj w kuchni.","Ćwicz intensywnie, korzystaj z energii."],
-  lutealna: ["Zapisz swoje emocje w dzienniku.","Medytuj 10 minut.","Zadbaj o sen i regenerację."]
-};
-
 function parseDate(str){return new Date(str+'T00:00:00');}
 function formatDate(date){return date.toISOString().split('T')[0];}
 function calculateAverageCycle(periods){let total=0;for(let i=1;i<periods.length;i++){total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);}return Math.round(total/(periods.length-1));}
@@ -180,8 +167,8 @@ function getCycleInfo(periods){
     ovulationDate:formatDate(ovulationDate),
     nextPeriod:formatDate(nextPeriod),
     tips: tips[phase],
-    quote: quotes[phase][Math.floor(Math.random()*quotes[phase].length)],
-    wellnessTip: wellnessTips[phase][Math.floor(Math.random()*wellnessTips[phase].length)]
+    quote: quotesTipsData[phase]?.quotes?.[Math.floor(Math.random() * (quotesTipsData[phase]?.quotes?.length || 1))] || '',
+wellnessTip: quotesTipsData[phase]?.tips?.[Math.floor(Math.random() * (quotesTipsData[phase]?.tips?.length || 1))] || ''
   };
 }
 
@@ -214,6 +201,15 @@ function updateCalendar(){
     calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayDetails("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
   }
 }
+let quotesTipsData = {};
+
+fetch('quotesTips.json')
+  .then(response => response.json())
+  .then(data => {
+    quotesTipsData = data;
+    updateUI(); // wywołanie aktualizacji UI dopiero po załadowaniu danych
+  })
+  .catch(err => console.error('Nie udało się załadować cytatów i porad:', err));
 
 function updateUI(){
   const info=getCycleInfo(periods);
