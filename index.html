@@ -112,6 +112,26 @@
     <button onclick="showNextCycle()">Następny cykl ▶</button>
   </div>
 </div>
+<div class="card">
+  <h2>Objawy dnia</h2>
+  <label>Ból brzucha:</label>
+  <input type="range" min="0" max="10" id="painLevel">
+  
+  <label>Nastrój:</label>
+  <select id="moodSelect">
+    <option>Dobry</option>
+    <option>Neutralny</option>
+    <option>Zły</option>
+  </select>
+  
+  <label>Energia:</label>
+  <input type="range" min="0" max="10" id="energyLevel">
+  
+  <label>Inne objawy:</label>
+  <textarea id="otherSymptoms" placeholder="np. bóle głowy, obrzmienie, senność..."></textarea>
+
+  <button onclick="saveSymptoms()">Zapisz objawy</button>
+</div>
 
 
 <div class="card">
@@ -324,16 +344,35 @@ function showDayModal(date, phaseClass){
   else if(phaseClass.includes('folikularna')) phase='folikularna';
   else if(phaseClass.includes('owulacja')) phase='owulacja';
   else phase='lutealna';
+
   const modal=document.getElementById('dayModal');
   document.getElementById('modalDate').textContent=date;
   document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
+
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
+
+  // Intimność
   const modalIntimacyTips = intimacyData[phase] || [];
-const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
-document.getElementById('modalIntimacy').innerHTML = `<div class="intimacy-tip">${randomModalIntimacyTip}</div>`;
+  const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
+  document.getElementById('modalIntimacy').innerHTML = `<div class="intimacy-tip">${randomModalIntimacyTip}</div>`;
+
+  // <<< TU WLEPIASZ OBJAWY >>>
+  const symptom = symptoms[date];
+  if (symptom) {
+    document.getElementById('modalWellness').innerHTML += `
+      <div class="symptom-card">
+        <h4>Objawy zapisane:</h4>
+        <p><strong>Ból:</strong> ${symptom.pain}/10</p>
+        <p><strong>Nastrój:</strong> ${symptom.mood}</p>
+        <p><strong>Energia:</strong> ${symptom.energy}/10</p>
+        <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
+      </div>`;
+  }
+
   modal.style.display='flex';
 }
+
 
 document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
 
@@ -349,6 +388,20 @@ function addPeriod(){
   const end=document.getElementById('endDate').value;
   if(start && end){ periods.push({start,end}); saveHistory(); updateUI(); alert('Dodano okres!'); }
   else alert('Wprowadź obie daty.');
+}
+// --- Objawy dnia ---
+let symptoms = JSON.parse(localStorage.getItem('symptoms')) || {};
+
+function saveSymptoms(){
+  const date = formatDate(new Date());
+  symptoms[date] = {
+    pain: document.getElementById('painLevel').value,
+    mood: document.getElementById('moodSelect').value,
+    energy: document.getElementById('energyLevel').value,
+    other: document.getElementById('otherSymptoms').value
+  };
+  localStorage.setItem('symptoms', JSON.stringify(symptoms));
+  alert('Zapisano objawy dnia!');
 }
 
 // --- Eksport / Import JSON ---
