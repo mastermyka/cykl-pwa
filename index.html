@@ -138,6 +138,16 @@
   </div>
 </div>
 
+<!-- Opcjonalnie eksport / import JSON historii cykli -->
+<div class="container">
+  <div class="card">
+    <h2>Eksport / Import historii</h2>
+    <button onclick="exportHistory()">Eksportuj JSON</button>
+    <input type="file" id="importFile" accept=".json">
+    <button onclick="importHistory()">Importuj JSON</button>
+  </div>
+</div>
+
 <script>
 const periods = [
   { start: '2025-01-07', end: '2025-01-10' },
