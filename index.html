@@ -354,39 +354,37 @@ function updateCalendar() {
 
 
 // --- Modal ---
-function showDayModal(date, phaseClass){
-  let phase='';
-  if(phaseClass.includes('menstruacja')) phase='menstruacja';
-  else if(phaseClass.includes('folikularna')) phase='folikularna';
-  else if(phaseClass.includes('owulacja')) phase='owulacja';
-  else phase='lutealna';
+function showDayModal(date, phaseClass) {
+  let phase = '';
+  if (phaseClass.includes('menstruacja')) phase = 'menstruacja';
+  else if (phaseClass.includes('folikularna')) phase = 'folikularna';
+  else if (phaseClass.includes('owulacja')) phase = 'owulacja';
+  else phase = 'lutealna';
 
-  const modal=document.getElementById('dayModal');
-  document.getElementById('modalDate').textContent=date;
-  document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
+  const modal = document.getElementById('dayModal');
+  document.getElementById('modalDate').textContent = date;
+  document.getElementById('modalPhase').textContent = 'Faza: ' + phase.toUpperCase();
 
+  // Tippy z tipami
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
+
   // Objawy dnia
-if (symptom) {  // używamy już istniejącej zmiennej symptom
-  document.getElementById('modalWellness').innerHTML += `
-    <div class="symptom-card">
-      <h4>Objawy zapisane:</h4>
-      <p><strong>Ból:</strong> ${symptom.pain}/10</p>
-      <p><strong>Nastrój:</strong> ${symptom.mood}</p>
-      <p><strong>Energia:</strong> ${symptom.energy}/10</p>
-      <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
-    </div>`;
-}
-
-  // Intimność
-  const modalIntimacyTips = intimacyData[phase] || [];
-  const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
-  document.getElementById('modalIntimacy').innerHTML = `<div class="intimacy-tip">${randomModalIntimacyTip}</div>`;
-
-  // <<< TU WLEPIASZ OBJAWY >>>
-  const symptom = symptoms[date];
+  const symptom = symptoms[date];  // <-- deklarujemy tylko raz
+  const symptomsContainer = document.getElementById('modalSymptoms');
+  symptomsContainer.innerHTML = ''; // wyczyść poprzednie
   if (symptom) {
+    // Wstawiamy w osobnym kontenerze
+    symptomsContainer.innerHTML = `
+      <div class="symptom-card">
+        <h4>Objawy zapisane:</h4>
+        <p><strong>Ból:</strong> ${symptom.pain}/10</p>
+        <p><strong>Nastrój:</strong> ${symptom.mood}</p>
+        <p><strong>Energia:</strong> ${symptom.energy}/10</p>
+        <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
+      </div>`;
+
+    // Jeśli chcesz dodatkowo do wellness
     document.getElementById('modalWellness').innerHTML += `
       <div class="symptom-card">
         <h4>Objawy zapisane:</h4>
@@ -397,9 +395,13 @@ if (symptom) {  // używamy już istniejącej zmiennej symptom
       </div>`;
   }
 
-  modal.style.display='flex';
-}
+  // Intymność
+  const modalIntimacyTips = intimacyData[phase] || [];
+  const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
+  document.getElementById('modalIntimacy').innerHTML = `<div class="intimacy-tip">${randomModalIntimacyTip}</div>`;
 
+  modal.style.display = 'flex';
+}
 
 document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
 
