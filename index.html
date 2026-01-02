@@ -233,7 +233,10 @@ function updateUI(){
 
   createAccordion('foodAccordion', foodData[info.phase], true);
   createAccordion('wellnessAccordion', wellnessData[info.phase], true);
-  createAccordion('intimacyAccordion', intimacyData[info.phase], true);
+  const intimacyTips = intimacyData[info.phase] || [];
+const randomIntimacyTip = intimacyTips[Math.floor(Math.random() * intimacyTips.length)] || '';
+document.getElementById('intimacyAccordion').innerHTML = `<div class="intimacy-tip">${randomIntimacyTip}</div>`;
+
 
   document.getElementById('dailyQuote').textContent=quotesTipsData[info.phase]?.quotes?.[Math.floor(Math.random()*(quotesTipsData[info.phase]?.quotes?.length||1))]||'';
   document.getElementById('dailyTip').textContent=quotesTipsData[info.phase]?.tips?.[Math.floor(Math.random()*(quotesTipsData[info.phase]?.tips?.length||1))]||'';
@@ -250,7 +253,6 @@ function updateHistory(){
     tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
   });
 }
-
 function updateCalendar(){
   const calendar=document.getElementById('calendar'); calendar.innerHTML='';
   const lastPeriod=parseDate(periods[periods.length-1].start);
@@ -278,7 +280,9 @@ function showDayModal(date, phaseClass){
   document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
-  createAccordion('modalIntimacy', intimacyData[phase], true);
+  const modalIntimacyTips = intimacyData[phase] || [];
+const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
+document.getElementById('modalIntimacy').innerHTML = `<div class="intimacy-tip">${randomModalIntimacyTip}</div>`;
   modal.style.display='flex';
 }
 
