@@ -100,7 +100,6 @@
 </div>
 
 <script>
-// dane cykli i rekomendacje (bez zmian)
 const periods = [
   { start: '2025-01-07', end: '2025-01-10' },
   { start: '2025-01-30', end: '2025-02-02' },
@@ -142,9 +141,26 @@ const tips = {
   }
 };
 
+// --- Wczytywanie cytatów i porad z JSON ---
+let quotesTipsData = {};
+fetch('quotesTips.json')
+  .then(response => response.json())
+  .then(data => {
+    quotesTipsData = data;
+    updateUI(); // aktualizacja UI po załadowaniu JSON
+  })
+  .catch(err => console.error('Nie udało się załadować cytatów i porad:', err));
+
+// --- Funkcje pomocnicze ---
 function parseDate(str){return new Date(str+'T00:00:00');}
 function formatDate(date){return date.toISOString().split('T')[0];}
-function calculateAverageCycle(periods){let total=0;for(let i=1;i<periods.length;i++){total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);}return Math.round(total/(periods.length-1));}
+function calculateAverageCycle(periods){
+  let total=0;
+  for(let i=1;i<periods.length;i++){
+    total+=(parseDate(periods[i].start)-parseDate(periods[i-1].start))/(1000*60*60*24);
+  }
+  return Math.round(total/(periods.length-1));
+}
 
 function getCycleInfo(periods){
   const avgCycle=calculateAverageCycle(periods);
@@ -152,29 +168,35 @@ function getCycleInfo(periods){
   const today=new Date();
   const dayOfCycle=Math.floor((today-lastPeriod)/(1000*60*60*24))+1;
   const ovulationDay=13;
+
   const fertileStart=new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate()+ovulationDay-5);
   const fertileEnd=new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate()+ovulationDay);
   const ovulationDate=new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate()+ovulationDay);
   const nextPeriod=new Date(lastPeriod); nextPeriod.setDate(nextPeriod.getDate()+avgCycle);
+
   let phase='',phaseClass='';
   if(dayOfCycle<=4){phase='menstruacja';phaseClass='menstruacja';}
   else if(dayOfCycle<=ovulationDay-2){phase='folikularna';phaseClass='folikularna';}
   else if(dayOfCycle===ovulationDay||dayOfCycle===ovulationDay-1){phase='owulacja';phaseClass='owulacja';}
   else{phase='lutealna';phaseClass='lutealna';}
+
   return {
     phase,phaseClass,dayOfCycle,
     fertileDays:[formatDate(fertileStart),formatDate(fertileEnd)],
     ovulationDate:formatDate(ovulationDate),
     nextPeriod:formatDate(nextPeriod),
     tips: tips[phase],
-    quote: quotesTipsData[phase]?.quotes?.[Math.floor(Math.random() * (quotesTipsData[phase]?.quotes?.length || 1))] || '',
-wellnessTip: quotesTipsData[phase]?.tips?.[Math.floor(Math.random() * (quotesTipsData[phase]?.tips?.length || 1))] || ''
+    quote: quotesTipsData[phase]?.quotes?.[Math.floor(Math.random()*(quotesTipsData[phase]?.quotes?.length||1))]||'',
+    wellnessTip: quotesTipsData[phase]?.tips?.[Math.floor(Math.random()*(quotesTipsData[phase]?.tips?.length||1))]||''
   };
 }
 
 function updateHistory(){
   const tbody=document.getElementById('historyTable'); tbody.innerHTML='';
-  periods.forEach(p=>{const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1; tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;});
+  periods.forEach(p=>{
+    const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1;
+    tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
+  });
 }
 
 function showDayDetails(date, phaseClass){
@@ -201,33 +223,29 @@ function updateCalendar(){
     calendar.innerHTML+=`<div class='day ${cls}' title='${formatDate(day)}' onclick='showDayDetails("${formatDate(day)}","${cls}")'>${day.getDate()}</div>`;
   }
 }
-let quotesTipsData = {};
-
-fetch('quotesTips.json')
-  .then(response => response.json())
-  .then(data => {
-    quotesTipsData = data;
-    updateUI(); // wywołanie aktualizacji UI dopiero po załadowaniu danych
-  })
-  .catch(err => console.error('Nie udało się załadować cytatów i porad:', err));
 
 function updateUI(){
   const info=getCycleInfo(periods);
-  const phaseDiv=document.getElementById('currentPhase'); phaseDiv.textContent=info.phase.toUpperCase(); phaseDiv.className=`phase ${info.phaseClass}`;
+  const phaseDiv=document.getElementById('currentPhase'); 
+  phaseDiv.textContent=info.phase.toUpperCase(); 
+  phaseDiv.className=`phase ${info.phaseClass}`;
+
   document.getElementById('cycleDay').textContent=info.dayOfCycle;
   document.getElementById('ovulationDate').textContent=info.ovulationDate;
   document.getElementById('fertileDays').textContent=`${info.fertileDays[0]} - ${info.fertileDays[1]}`;
   document.getElementById('nextPeriod').textContent=info.nextPeriod;
-  
-  const foodList=document.getElementById('foodList'); foodList.innerHTML=''; info.tips.food.forEach(f=>foodList.innerHTML+=`<li>${f}</li>`);
-  const exerciseList=document.getElementById('exerciseList'); exerciseList.innerHTML=''; info.tips.exercise.forEach(e=>exerciseList.innerHTML+=`<li>${e}</li>`);
+
+  const foodList=document.getElementById('foodList'); foodList.innerHTML='';
+  info.tips.food.forEach(f=>foodList.innerHTML+=`<li>${f}</li>`);
+  const exerciseList=document.getElementById('exerciseList'); exerciseList.innerHTML='';
+  info.tips.exercise.forEach(e=>exerciseList.innerHTML+=`<li>${e}</li>`);
   document.getElementById('mood').textContent=info.tips.mood;
 
-  // Cytat i porada dnia na górze
   document.getElementById('dailyQuote').textContent=info.quote;
   document.getElementById('dailyTip').textContent=info.wellnessTip;
-  
-  updateHistory(); updateCalendar();
+
+  updateHistory(); 
+  updateCalendar();
 }
 
 function addPeriod(){
@@ -237,8 +255,7 @@ function addPeriod(){
   else alert('Wprowadź obie daty.');
 }
 
-updateUI();
-
+// --- Service Worker ---
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('service-worker.js').then(()=>console.log('Service Worker zarejestrowany'));
 }
