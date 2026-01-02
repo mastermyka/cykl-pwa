@@ -137,6 +137,7 @@
     <p id="modalPhase"></p>
     <div id="modalFood"></div>
     <div id="modalWellness"></div>
+    <div id="modalIntimacy"></div>
   </div>
 </div>
 
@@ -262,7 +263,7 @@ function updateUI(){
   document.getElementById('nextPeriod').textContent=info.nextPeriod;
   createAccordion('foodAccordion', foodData[info.phase]);
   createAccordion('wellnessAccordion', wellnessData[info.phase]);
-  createAccordion('intimacyAccordion', intimacyData[info.phase]);
+  createAccordion('intimacyAccordion', { [info.phase]: intimacyData[info.phase] });
   document.getElementById('dailyQuote').textContent=info.quote;
   document.getElementById('dailyTip').textContent=info.wellnessTip;
   updateHistory();
@@ -289,7 +290,7 @@ function showDayModal(date, phaseClass){
   document.getElementById('modalPhase').textContent='Faza: '+phase.toUpperCase();
   createAccordion('modalFood', foodData[phase]);
   createAccordion('modalWellness', wellnessData[phase]);
-  createAccordion('modalIntimacy', intimacyData[phase]);
+  createAccordion('modalIntimacy', { [phase]: intimacyData[phase] });
   modal.style.display='flex';
 }
 document.getElementById('closeModal').addEventListener('click',()=>{document.getElementById('dayModal').style.display='none';});
