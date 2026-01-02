@@ -123,8 +123,13 @@
 <div class="card">
   <h2>Objawy dnia</h2>
   <label>Ból brzucha:</label>
-  <input type="range" min="0" max="10" id="painLevel">
-  <span id="painValue">5</span>
+<input type="range" min="0" max="10" value="5" id="painLevel" oninput="painValue.textContent=this.value">
+<div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+  <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+  <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<span id="painValue">5</span>
+
   
   <label>Nastrój:</label>
   <select id="moodSelect">
@@ -134,8 +139,12 @@
   </select>
   
   <label>Energia:</label>
-  <input type="range" min="0" max="10" id="energyLevel">
-  <span id="energyValue">5</span>
+<input type="range" min="0" max="10" value="5" id="energyLevel" oninput="energyValue.textContent=this.value">
+<div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.5rem;">
+  <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+  <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<span id="energyValue">5</span>
   
   <label>Inne objawy:</label>
   <textarea id="otherSymptoms" placeholder="np. bóle głowy, obrzmienie, senność..."></textarea>
