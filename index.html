@@ -8,8 +8,8 @@
   body { font-family: Arial, sans-serif; margin:0; padding:0; background:#fff; color:#333;}
   header { background:#ff8da1; color:#fff; padding:15px; text-align:center; font-size:1.5em;}
   #quote, #wellness { margin:15px; font-size:1.2em; text-align:center;}
-  #calendar { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; margin:15px;}
-  .day { border:1px solid #ccc; padding:10px; text-align:center; cursor:pointer; user-select:none; }
+  #calendar { margin:15px;}
+  .day { padding:10px; margin:2px 0; cursor:pointer; border-radius:5px; color:#000; }
   .menstruation { background:#ffb3b3; }
   .follicular { background:#ffd9b3; }
   .ovulation { background:#b3ffc6; }
@@ -34,7 +34,7 @@
     border-radius:10px;
     width:90%;
     max-width:400px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow:0 4px 8px rgba(0,0,0,0.2);
   }
   #popupContent h3 { margin-top:0; }
   #popupContent label { display:block; margin-top:10px; }
@@ -125,7 +125,7 @@ showDailyQuote();
 showDailyWellness();
 
 // --------------------------
-// Interaktywny kalendarz
+// Interaktywny kalendarz pionowy (Etap 2)
 // --------------------------
 const calendarDiv = document.getElementById('calendar');
 
@@ -163,35 +163,18 @@ function getPhase(date) {
 
 function updateCalendar() {
   calendarDiv.innerHTML="";
+  // Tworzymy pionową listę dni
   const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const firstDay = new Date(year, month,1);
-  const lastDay = new Date(year, month+1,0);
-  // dodajemy nagłówki dni tygodnia
-  const days = ["Pn","Wt","Śr","Cz","Pt","Sb","Nd"];
-  for(let d of days){
-    const headerDiv = document.createElement("div");
-    headerDiv.textContent = d;
-    headerDiv.style.fontWeight = "bold";
-    headerDiv.style.textAlign = "center";
-    calendarDiv.appendChild(headerDiv);
-  }
-  // puste dni na początku miesiąca
-  const startWeekDay = (firstDay.getDay()+6)%7; // przesunięcie Pn=0
-  for(let i=0;i<startWeekDay;i++){
-    const emptyDiv = document.createElement("div");
-    calendarDiv.appendChild(emptyDiv);
-  }
-  // dni miesiąca
-  for(let i=1;i<=lastDay.getDate();i++){
-    const dayDate = new Date(year,month,i);
-    const phaseObj = getPhase(dayDate);
+  const startDate = new Date(today.getFullYear(),0,1); // początek roku
+  const endDate = new Date(today.getFullYear(),11,31); // koniec roku
+  for(let d=startDate; d<=endDate; d.setDate(d.getDate()+1)){
+    const phaseObj = getPhase(new Date(d));
     const div = document.createElement('div');
     div.className = "day "+phaseObj.phase;
-    div.textContent = i;
-    div.dataset.date = dayDate.toISOString().split('T')[0];
-    div.addEventListener('click',()=>openPopup(div.dataset.date));
+    const dayStr = new Date(d).toISOString().split('T')[0];
+    div.dataset.date = dayStr;
+    div.textContent = dayStr + " - " + phaseObj.label;
+    div.addEventListener('click',()=>openPopup(dayStr));
     calendarDiv.appendChild(div);
   }
 }
