@@ -368,11 +368,8 @@ function showDayModal(date, phaseClass){
   createAccordion('modalFood', foodData[phase], true);
   createAccordion('modalWellness', wellnessData[phase], true);
   // Objawy dnia
-const symptom = symptoms[date];
-const symptomsContainer = document.getElementById('modalSymptoms');
-symptomsContainer.innerHTML = ''; // wyczyść poprzednie
-if (symptom) {
-  symptomsContainer.innerHTML = `
+if (symptom) {  // używamy już istniejącej zmiennej symptom
+  document.getElementById('modalWellness').innerHTML += `
     <div class="symptom-card">
       <h4>Objawy zapisane:</h4>
       <p><strong>Ból:</strong> ${symptom.pain}/10</p>
@@ -381,6 +378,7 @@ if (symptom) {
       <p><strong>Inne:</strong> ${symptom.other || '—'}</p>
     </div>`;
 }
+
   // Intimność
   const modalIntimacyTips = intimacyData[phase] || [];
   const randomModalIntimacyTip = modalIntimacyTips[Math.floor(Math.random() * modalIntimacyTips.length)] || '';
