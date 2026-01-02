@@ -1,22 +1,203 @@
 {
   "menstruacja": {
-    "Śniadanie": ["Owsianka z malinami i migdałami", "Herbata z imbirem"],
-    "Lunch": ["Zupa krem z dyni", "Grillowana pierś z kurczaka", "Sałatka z burakami i soczewicą"],
-    "Kolacja": ["Pełnoziarnisty chleb z pastą warzywną", "Sałatka z soczewicą", "Ciemna czekolada"]
+    "Śniadanie": [
+      "Owsianka z malinami i migdałami",
+      "Jajecznica ze szpinakiem i pomidorami",
+      "Smoothie z bananem, truskawkami i jogurtem",
+      "Chleb pełnoziarnisty z awokado i jajkiem",
+      "Placuszki owsiane z borówkami",
+      "Twarożek z miodem i orzechami",
+      "Kasza jaglana z jabłkiem i cynamonem",
+      "Omlet z warzywami",
+      "Płatki owsiane na mleku roślinnym z owocami",
+      "Jogurt naturalny z granolą i jagodami"
+    ],
+    "Drugie śniadanie": [
+      "Sałatka z buraków i soczewicy",
+      "Marchewki i hummus",
+      "Orzechy mieszane z suszonymi owocami",
+      "Jabłko z masłem orzechowym",
+      "Koktajl proteinowy z bananem",
+      "Kanapka z pełnoziarnistego chleba i awokado",
+      "Gruszka i migdały",
+      "Smoothie z malin i jogurtu"
+    ],
+    "Obiad": [
+      "Filet z łososia z kaszą jaglaną i warzywami",
+      "Kurczak pieczony z batatami i brokułami",
+      "Makaron pełnoziarnisty z pesto i szpinakiem",
+      "Sałatka z tuńczykiem, jajkiem i fasolą",
+      "Warzywna zapiekanka z serem feta",
+      "Kotlety z ciecierzycy z ryżem i surówką",
+      "Zupa krem z dyni z prażonymi pestkami",
+      "Ryba pieczona w folii z warzywami"
+    ],
+    "Podwieczorek": [
+      "Jogurt z owocami",
+      "Smoothie zielone",
+      "Orzechy włoskie i suszone morele",
+      "Kanapka z awokado",
+      "Herbata z imbirem i miodem",
+      "Batonik owsiany domowej roboty",
+      "Owoc sezonowy"
+    ],
+    "Kolacja": [
+      "Sałatka z ciecierzycą i warzywami",
+      "Omlet warzywny",
+      "Zupa krem brokułowa",
+      "Ryba pieczona z warzywami",
+      "Kasza jaglana z warzywami i tofu",
+      "Kanapka pełnoziarnista z twarogiem",
+      "Sałatka z awokado i jajkiem"
+    ]
   },
   "folikularna": {
-    "Śniadanie": ["Jajecznica z warzywami", "Owsianka z owocami"],
-    "Lunch": ["Sałatka z kurczakiem i awokado", "Kasza jaglana", "Zupa krem z marchwi"],
-    "Kolacja": ["Ryba pieczona z warzywami", "Sałatka grecka", "Grillowane warzywa"]
+    "Śniadanie": [
+      "Jajka na miękko z warzywami",
+      "Owsianka z owocami i orzechami",
+      "Smoothie z mango i szpinakiem",
+      "Omlet z pomidorami i rukolą",
+      "Tosty pełnoziarniste z awokado",
+      "Jogurt naturalny z granolą",
+      "Kasza jaglana z malinami",
+      "Chia pudding z owocami",
+      "Placuszki bananowe z płatkami owsianymi",
+      "Kanapka z łososiem wędzonym i szpinakiem"
+    ],
+    "Drugie śniadanie": [
+      "Jabłko i migdały",
+      "Marchewki z hummusem",
+      "Banan z masłem orzechowym",
+      "Orzechy nerkowca i suszone owoce",
+      "Koktajl owocowy z jogurtem",
+      "Sałatka owocowa",
+      "Kanapka z indykiem i warzywami",
+      "Serek wiejski z pomidorami"
+    ],
+    "Obiad": [
+      "Kurczak pieczony z warzywami i ryżem",
+      "Makaron pełnoziarnisty z tuńczykiem i warzywami",
+      "Zupa krem z brokułów",
+      "Sałatka z jajkiem, ciecierzycą i szpinakiem",
+      "Filet z dorsza z kaszą i warzywami",
+      "Stir-fry z tofu i warzywami",
+      "Pieczony łosoś z batatami",
+      "Warzywna tortilla z hummusem"
+    ],
+    "Podwieczorek": [
+      "Smoothie z jagodami",
+      "Orzechy włoskie z suszonymi morelami",
+      "Batonik owsiany domowej roboty",
+      "Kanapka z awokado i pomidorem",
+      "Herbata zielona z imbirem"
+    ],
+    "Kolacja": [
+      "Sałatka z kurczakiem i awokado",
+      "Omlet warzywny",
+      "Zupa krem z dyni",
+      "Ryba pieczona z warzywami",
+      "Kasza z warzywami i tofu",
+      "Kanapka pełnoziarnista z twarogiem",
+      "Sałatka z jajkiem i szpinakiem"
+    ]
   },
   "owulacja": {
-    "Śniadanie": ["Smoothie z jagodami i bananem", "Jogurt z granolą"],
-    "Lunch": ["Sałatka z quinoa i warzywami", "Grillowana pierś z kurczaka"],
-    "Kolacja": ["Makaron pełnoziarnisty z warzywami", "Sałatka z orzechami", "Pieczony łosoś"]
+    "Śniadanie": [
+      "Owsianka z jagodami i orzechami",
+      "Smoothie z bananem i szpinakiem",
+      "Omlet z warzywami",
+      "Jajka sadzone z pomidorami",
+      "Tosty z awokado i łososiem",
+      "Chia pudding z owocami",
+      "Placuszki bananowe",
+      "Jogurt naturalny z granolą",
+      "Kasza jaglana z owocami",
+      "Kanapka pełnoziarnista z jajkiem"
+    ],
+    "Drugie śniadanie": [
+      "Batonik energetyczny domowej roboty",
+      "Smoothie z mango",
+      "Orzechy mieszane",
+      "Jabłko z masłem orzechowym",
+      "Kanapka z indykiem",
+      "Marchewki i hummus",
+      "Serek wiejski z pomidorem"
+    ],
+    "Obiad": [
+      "Łosoś pieczony z warzywami i ryżem",
+      "Kurczak stir-fry z warzywami",
+      "Makaron pełnoziarnisty z pesto i warzywami",
+      "Zupa krem z dyni",
+      "Sałatka z tuńczykiem i jajkiem",
+      "Pieczony dorsz z batatami",
+      "Warzywna tortilla z hummusem",
+      "Filet z indyka z kaszą i warzywami"
+    ],
+    "Podwieczorek": [
+      "Smoothie z jagodami",
+      "Orzechy włoskie i suszone owoce",
+      "Jogurt naturalny z owocami",
+      "Kanapka z awokado",
+      "Batonik owsiany domowej roboty"
+    ],
+    "Kolacja": [
+      "Sałatka z awokado i jajkiem",
+      "Omlet warzywny",
+      "Zupa krem brokułowa",
+      "Ryba pieczona z warzywami",
+      "Kasza z warzywami i tofu",
+      "Kanapka pełnoziarnista z twarogiem",
+      "Sałatka z tuńczykiem"
+    ]
   },
   "lutealna": {
-    "Śniadanie": ["Jogurt naturalny z owocami i siemieniem", "Owsianka z jabłkiem i cynamonem"],
-    "Lunch": ["Kasza gryczana z warzywami", "Pieczona ryba", "Sałatka z ciecierzycą i awokado"],
-    "Kolacja": ["Ciemna czekolada", "Sałatka z warzyw z oliwą", "Zupa krem z dyni"]
+    "Śniadanie": [
+      "Owsianka z bananem i cynamonem",
+      "Jajka na miękko z warzywami",
+      "Smoothie z malinami i jogurtem",
+      "Omlet z pomidorami i szpinakiem",
+      "Tosty pełnoziarniste z awokado",
+      "Placuszki owsiane z owocami",
+      "Kasza jaglana z jabłkiem i orzechami",
+      "Jogurt naturalny z granolą",
+      "Chleb pełnoziarnisty z jajkiem",
+      "Twarożek z miodem"
+    ],
+    "Drugie śniadanie": [
+      "Marchewki z hummusem",
+      "Jabłko z migdałami",
+      "Orzechy nerkowca",
+      "Banan z masłem orzechowym",
+      "Kanapka z indykiem",
+      "Koktajl owocowy",
+      "Serek wiejski z pomidorami",
+      "Smoothie zielone"
+    ],
+    "Obiad": [
+      "Kurczak pieczony z batatami i brokułami",
+      "Makaron pełnoziarnisty z pesto i warzywami",
+      "Filet z dorsza z kaszą i warzywami",
+      "Zupa krem z dyni",
+      "Sałatka z jajkiem i ciecierzycą",
+      "Warzywna tortilla z hummusem",
+      "Pieczony łosoś z warzywami",
+      "Stir-fry z tofu i warzywami"
+    ],
+    "Podwieczorek": [
+      "Smoothie z bananem",
+      "Orzechy włoskie i suszone owoce",
+      "Jogurt naturalny z owocami",
+      "Kanapka z awokado",
+      "Batonik owsiany domowej roboty"
+    ],
+    "Kolacja": [
+      "Sałatka z awokado i jajkiem",
+      "Omlet warzywny",
+      "Zupa krem brokułowa",
+      "Ryba pieczona z warzywami",
+      "Kasza z warzywami i tofu",
+      "Kanapka pełnoziarnista z twarogiem",
+      "Sałatka z kurczakiem"
+    ]
   }
 }
