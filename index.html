@@ -154,7 +154,10 @@
   <button onclick="saveSymptoms()">Zapisz objawy</button>
 </div>
 <!-- Dodaj pod przyciskiem Zapisz objawy -->
-<canvas id="symptomChart" style="width:100%; max-height:220px; margin-top:10px;"></canvas>
+<div style="overflow-x:auto;">
+  <canvas id="symptomChart" style="max-height:220px; margin-top:10px;"></canvas>
+</div>
+
 
 <div class="card">
 <h2>Historia cykli</h2>
@@ -348,11 +351,15 @@ let symptomChart; // zmienna globalna wykresu
 
 function updateSymptomChart() {
   const dates = Object.keys(symptoms).sort();
-  const painData = dates.map(d => symptoms[d].pain || 0);
-  const energyData = dates.map(d => symptoms[d].energy || 0);
-  const moodData = dates.map(d => symptoms[d].mood || 0);
+  const painData = dates.map(d => parseInt(symptoms[d].pain) || 0);
+  const energyData = dates.map(d => parseInt(symptoms[d].energy) || 0);
+  const moodData = dates.map(d => parseInt(symptoms[d].moodValue) || 0); // suwak nastroju
 
-  const ctx = document.getElementById('symptomChart').getContext('2d');
+  const canvas = document.getElementById('symptomChart');
+  // ustawiamy szerokość: 30px na dzień, minimum 500px
+  canvas.width = Math.max(dates.length * 30, 500);
+
+  const ctx = canvas.getContext('2d');
 
   if(symptomChart) symptomChart.destroy(); // usuń poprzedni wykres
 
@@ -380,7 +387,7 @@ function updateSymptomChart() {
         {
           label: 'Nastrój',
           data: moodData,
-          borderColor: '#4caf50', // zielony
+          borderColor: '#4caf50',
           backgroundColor: 'rgba(76,175,80,0.2)',
           tension: 0.3,
           fill: true
@@ -388,25 +395,19 @@ function updateSymptomChart() {
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false, // dopasowanie do max-height
+      responsive: false, // false, bo szerokość ustawiamy ręcznie
+      maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: true
-        },
-        tooltip: {
-          enabled: false // wyłączamy, bo mamy modal
-        }
+        legend: { display: true },
+        tooltip: { enabled: false }
       },
       scales: {
-        y: {
-          min: 0,
-          max: 10
-        }
+        y: { min: 0, max: 10 }
       }
     }
   });
 }
+
 
 
 
@@ -554,19 +555,20 @@ function addPeriod(){
 }
 // --- Objawy dnia ---
 let symptoms = JSON.parse(localStorage.getItem('symptoms')) || {};
-
 function saveSymptoms(){
   const date = formatDate(new Date());
   symptoms[date] = {
-  pain: parseInt(document.getElementById('painLevel').value),
-  mood: parseInt(document.getElementById('moodLevel').value),
-  energy: parseInt(document.getElementById('energyLevel').value),
-  other: document.getElementById('otherSymptoms').value
-};
+    pain: document.getElementById('painLevel').value,
+    energy: document.getElementById('energyLevel').value,
+    moodValue: document.getElementById('moodLevel').value, // wartość liczbowo dla wykresu
+    mood: ["Zły","Neutralny","Dobry"][Math.round(document.getElementById('moodLevel').value/5)], // opcjonalnie tekst
+    other: document.getElementById('otherSymptoms').value
+  };
   localStorage.setItem('symptoms', JSON.stringify(symptoms));
   alert('Zapisano objawy dnia!');
   updateSymptomChart();
 }
+
 
 // --- Eksport / Import JSON ---
 function exportHistory(){
