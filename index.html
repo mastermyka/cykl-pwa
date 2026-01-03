@@ -132,11 +132,13 @@
 
   
   <label>Nastrój:</label>
-  <select id="moodSelect">
-    <option>Dobry</option>
-    <option>Neutralny</option>
-    <option>Zły</option>
-  </select>
+<input type="range" min="0" max="10" value="5" id="moodLevel" oninput="moodValue.textContent=this.value">
+<div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.5rem;">
+  <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+  <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<span id="moodValue">5</span>
+
   
   <label>Energia:</label>
 <input type="range" min="0" max="10" value="5" id="energyLevel" oninput="energyValue.textContent=this.value">
@@ -348,6 +350,7 @@ function updateSymptomChart() {
   const dates = Object.keys(symptoms).sort();
   const painData = dates.map(d => symptoms[d].pain || 0);
   const energyData = dates.map(d => symptoms[d].energy || 0);
+  const moodData = dates.map(d => symptoms[d].mood || 0);
 
   const ctx = document.getElementById('symptomChart').getContext('2d');
 
@@ -373,6 +376,14 @@ function updateSymptomChart() {
           backgroundColor: 'rgba(86,204,242,0.2)',
           tension: 0.3,
           fill: true
+        },
+        {
+          label: 'Nastrój',
+          data: moodData,
+          borderColor: '#4caf50', // zielony
+          backgroundColor: 'rgba(76,175,80,0.2)',
+          tension: 0.3,
+          fill: true
         }
       ]
     },
@@ -396,6 +407,7 @@ function updateSymptomChart() {
     }
   });
 }
+
 
 
 // --- Historia i kalendarz ---
@@ -546,11 +558,11 @@ let symptoms = JSON.parse(localStorage.getItem('symptoms')) || {};
 function saveSymptoms(){
   const date = formatDate(new Date());
   symptoms[date] = {
-    pain: document.getElementById('painLevel').value,
-    mood: document.getElementById('moodSelect').value,
-    energy: document.getElementById('energyLevel').value,
-    other: document.getElementById('otherSymptoms').value
-  };
+  pain: parseInt(document.getElementById('painLevel').value),
+  mood: parseInt(document.getElementById('moodLevel').value),
+  energy: parseInt(document.getElementById('energyLevel').value),
+  other: document.getElementById('otherSymptoms').value
+};
   localStorage.setItem('symptoms', JSON.stringify(symptoms));
   alert('Zapisano objawy dnia!');
   updateSymptomChart();
