@@ -351,6 +351,11 @@ let symptomChart; // zmienna globalna wykresu
 
 function updateSymptomChart() {
   const dates = Object.keys(symptoms).sort();
+  const labels = dates.map(d => {
+    const dt = new Date(d);
+    return `${dt.getDate()}.${dt.getMonth()+1}`; // np. "3.1"
+  });
+
   const painData = dates.map(d => parseInt(symptoms[d].pain) || 0);
   const energyData = dates.map(d => parseInt(symptoms[d].energy) || 0);
   const moodData = dates.map(d => parseInt(symptoms[d].moodValue) || 0); // suwak nastroju
@@ -366,7 +371,7 @@ function updateSymptomChart() {
   symptomChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: dates,
+      labels: labels, // <-- tu musi być "labels", nie "dates"
       datasets: [
         {
           label: 'Ból',
