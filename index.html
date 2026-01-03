@@ -113,7 +113,7 @@
 </div>
 
 <div class="card">
-  <h2>Kalendarz cykli</h2>
+  <h2 class="calendar-title">Kalendarz cyklu</h2>
   <div id="calendar" class="calendar"></div>
   <div class="calendar-nav" style="text-align:center; margin-top:10px;">
     <button onclick="showPreviousCycle()">◀ Poprzedni cykl</button>
@@ -243,22 +243,46 @@ function calculateAverageCycle(periods){
 
 function getCycleInfo(periods){
   const avgCycle = calculateAverageCycle(periods);
-  const lastPeriod = parseDate(periods[periods.length-1].start);
+  const lastPeriod = parseDate(periods[periods.length - 1].start);
   const today = new Date();
-  const dayOfCycle = Math.floor((today-lastPeriod)/(1000*60*60*24))+1;
-  const ovulationDay = 13;
-  const fertileStart = new Date(lastPeriod); fertileStart.setDate(fertileStart.getDate()+ovulationDay-5);
-  const fertileEnd = new Date(lastPeriod); fertileEnd.setDate(fertileEnd.getDate()+ovulationDay);
-  const ovulationDate = new Date(lastPeriod); ovulationDate.setDate(ovulationDate.getDate()+ovulationDay);
-  const nextPeriod = new Date(lastPeriod); nextPeriod.setDate(nextPeriod.getDate()+avgCycle);
+  const dayOfCycle = Math.floor((today - lastPeriod) / (1000 * 60 * 60 * 24)) + 1;
 
-  let phase='', phaseClass='';
-  if(dayOfCycle<=4){phase='menstruacja';phaseClass='menstruacja';}
-  else if(dayOfCycle<=ovulationDay-2){phase='folikularna';phaseClass='folikularna';}
-  else if(dayOfCycle===ovulationDay||dayOfCycle===ovulationDay-1){phase='owulacja';phaseClass='owulacja';}
-  else{phase='lutealna';phaseClass='lutealna';}
+  // Owulacja = 14 dni przed końcem cyklu
+  const ovulationDay = avgCycle - 14;
 
-  return { phase, phaseClass, dayOfCycle, fertileDays:[formatDate(fertileStart),formatDate(fertileEnd)], ovulationDate:formatDate(ovulationDate), nextPeriod:formatDate(nextPeriod) };
+  // Dni płodne = 5 dni przed i 2 dni po owulacji
+  const fertileStart = new Date(lastPeriod);
+  fertileStart.setDate(fertileStart.getDate() + ovulationDay - 5);
+
+  const fertileEnd = new Date(lastPeriod);
+  fertileEnd.setDate(fertileEnd.getDate() + ovulationDay + 2);
+
+  const ovulationDate = new Date(lastPeriod);
+  ovulationDate.setDate(ovulationDate.getDate() + ovulationDay);
+
+  const nextPeriod = new Date(lastPeriod);
+  nextPeriod.setDate(nextPeriod.getDate() + avgCycle);
+
+  // Faza cyklu (dla wyświetlania kolorów i rekomendacji)
+  let phase = '', phaseClass = '';
+  if (dayOfCycle <= 4) {
+    phase = 'menstruacja'; phaseClass = 'menstruacja';
+  } else if (dayOfCycle <= ovulationDay - 2) {
+    phase = 'folikularna'; phaseClass = 'folikularna';
+  } else if (dayOfCycle <= ovulationDay + 2) {
+    phase = 'owulacja'; phaseClass = 'owulacja';
+  } else {
+    phase = 'lutealna'; phaseClass = 'lutealna';
+  }
+
+  return {
+    phase,
+    phaseClass,
+    dayOfCycle,
+    fertileDays: [formatDate(fertileStart), formatDate(fertileEnd)],
+    ovulationDate: formatDate(ovulationDate),
+    nextPeriod: formatDate(nextPeriod)
+  };
 }
 
 // --- Losowe elementy ---
@@ -347,24 +371,64 @@ function updateCalendar() {
   const calendar = document.getElementById('calendar');
   calendar.innerHTML = '';
 
-  const period = periods[currentCycleIndex];
   const avgCycle = calculateAverageCycle(periods);
+  const period = periods[currentCycleIndex];
   const startDate = parseDate(period.start);
 
-  for (let i = 0; i < avgCycle; i++) {
+  // Oblicz prognozy faz cyklu
+  const nextPeriod = new Date(startDate);
+  nextPeriod.setDate(nextPeriod.getDate() + avgCycle);
+
+  const ovulationDate = new Date(nextPeriod);
+  ovulationDate.setDate(ovulationDate.getDate() - 14);
+
+  const fertileStart = new Date(ovulationDate);
+  fertileStart.setDate(fertileStart.getDate() - 5);
+
+  const fertileEnd = new Date(ovulationDate);
+  fertileEnd.setDate(fertileEnd.getDate() + 2);
+
+  // zakres dni: aktualny cykl + tydzień zapasu
+  const totalDays = avgCycle + 7;
+
+  for (let i = 0; i < totalDays; i++) {
     const day = new Date(startDate);
     day.setDate(day.getDate() + i);
+    const dateStr = formatDate(day);
+
     let cls = '';
-    if (i < 4) cls = 'menstruacja-day';
-    else if (i < 12) cls = 'folikularna-day';
-    else if (i === 11 || i === 12) cls = 'owulacja-day';
-    else cls = 'lutealna-day';
+
+    // 1️⃣ Miesiączka
+    if (dateStr >= period.start && dateStr <= period.end) {
+      cls = 'menstruacja-day';
+    }
+    // 2️⃣ Dni płodne (5 przed owulacją do 2 po)
+    else if (dateStr >= formatDate(fertileStart) && dateStr <= formatDate(fertileEnd)) {
+      cls = 'folikularna-day';
+    }
+    // 3️⃣ Dzień owulacji
+    else if (dateStr === formatDate(ovulationDate)) {
+      cls = 'owulacja-day';
+    }
+    // 4️⃣ Lutealna (po owulacji do następnej miesiączki)
+    else {
+      cls = 'lutealna-day';
+    }
+
     calendar.innerHTML += `
-      <div class='day ${cls}' title='${formatDate(day)}'
-           onclick='showDayModal("${formatDate(day)}","${cls}")'>
+      <div class='day ${cls}' title='${dateStr}' onclick='showDayModal("${dateStr}", "${cls}")'>
         ${day.getDate()}
+        ${dateStr === formatDate(ovulationDate) ? "<div style='font-size:0.6rem;'>💧</div>" : ""}
       </div>`;
   }
+
+  // 🔹 Zmień tylko tytuł kalendarza (nie innych kart)
+  const title = document.querySelector(".calendar-title");
+  if (title) {
+    title.textContent = "Kalendarz cyklu: " + (currentCycleIndex + 1) + " z " + periods.length;
+  }
+}
+
 
   // aktualizacja tytułu karty
   document.querySelector(".card h2").textContent =
