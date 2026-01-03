@@ -429,13 +429,6 @@ function updateCalendar() {
   }
 }
 
-
-  // aktualizacja tytułu karty
-  document.querySelector(".card h2").textContent =
-    "Kalendarz cyklu: " + (currentCycleIndex + 1) + " z " + periods.length;
-}
-
-
 function showDayModal(date, phaseClass) {
   let phase = '';
   if (phaseClass.includes('menstruacja')) phase = 'menstruacja';
