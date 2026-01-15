@@ -178,6 +178,11 @@
   <label for="endDate">Koniec okresu:</label>
   <input type="date" id="endDate">
   <button onclick="addPeriodEnd()">Zakończ bieżący okres</button>
+  <button 
+  onclick="editLastPeriod()" 
+  style="background:#ffa726;color:white;border:none;border-radius:10px;padding:0.7rem 1.2rem;margin-top:0.5rem;width:100%;font-weight:bold;">
+  Edytuj bieżący okres
+</button>
 </div>
 
 <div class="card">
@@ -593,7 +598,31 @@ function addPeriod(){
     alert('Dodano okres!'); 
   } else alert('Wprowadź obie daty.');
 }
+function editLastPeriod() {
+  if (periods.length === 0) {
+    alert('Brak okresów do edycji.');
+    return;
+  }
 
+  const last = periods[periods.length - 1];
+  const newStart = prompt('Nowa data początku (RRRR-MM-DD):', last.start || '');
+  if (!newStart) return;
+
+  const newEnd = prompt('Nowa data końca (RRRR-MM-DD lub zostaw puste jeśli trwa):', last.end || '');
+  
+  // Walidacja prostych dat
+  if (newEnd && new Date(newEnd) < new Date(newStart)) {
+    alert('Data końca nie może być wcześniejsza niż początek.');
+    return;
+  }
+
+  last.start = newStart;
+  last.end = newEnd || null;
+
+  saveHistory();
+  updateUI();
+  alert('Zaktualizowano bieżący okres.');
+}
 // --- Nowe funkcje: dodawanie początku i końca osobno ---
 function addPeriodStart() {
   const start = document.getElementById('startDate').value;
