@@ -704,7 +704,14 @@ function downloadICSWithAlert(eventTitle, eventDate) {
   const dd = String(dt.getDate()).padStart(2,'0');
   const dtStart = `${yyyy}${mm}${dd}`;
 
-  // ICS z alarmem 1 dzień wcześniej (1440 minut)
+  // --- Funkcja downloadICSWithAlert (bez zmian) ---
+function downloadICSWithAlert(eventTitle, eventDate) {
+  const dt = new Date(eventDate);
+  const yyyy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2,'0');
+  const dd = String(dt.getDate()).padStart(2,'0');
+  const dtStart = `${yyyy}${mm}${dd}`;
+
   const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
@@ -725,7 +732,6 @@ END:VEVENT
 END:VCALENDAR
   `.trim();
 
-  // Tworzymy plik i pobieramy
   const blob = new Blob([icsContent], { type: 'text/calendar' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -735,16 +741,40 @@ END:VCALENDAR
   URL.revokeObjectURL(url);
 }
 
-// --- Przykład użycia ---
+// --- Tworzenie karty z przyciskami ICS w stylu UI ---
 const info = getCycleInfo(periods);
 
-const buttonDiv = document.createElement('div');
-buttonDiv.style.marginTop = '1rem';
-buttonDiv.innerHTML = `
-  <button onclick="downloadICSWithAlert('Nadchodzący okres', '${info.nextPeriod}')">Dodaj przypomnienie okresu do kalendarza</button>
-  <button onclick="downloadICSWithAlert('Owulacja', '${info.ovulationDate}')">Dodaj przypomnienie owulacji do kalendarza</button>
+const icsCard = document.createElement('div');
+icsCard.className = 'card';
+icsCard.innerHTML = `
+  <h2>Przypomnienia w Kalendarzu</h2>
+  <button class="ics-btn" onclick="downloadICSWithAlert('Nadchodzący okres', '${info.nextPeriod}')">Dodaj przypomnienie okresu</button>
+  <button class="ics-btn" onclick="downloadICSWithAlert('Owulacja', '${info.ovulationDate}')">Dodaj przypomnienie owulacji</button>
 `;
-document.querySelector('.container').appendChild(buttonDiv);
+
+document.querySelector('.container').appendChild(icsCard);
+
+// --- Styl przycisków ICS ---
+const style = document.createElement('style');
+style.textContent = `
+  .ics-btn {
+    display:block;
+    width:100%;
+    padding:0.7rem 1.2rem;
+    margin:0.5rem 0;
+    background: linear-gradient(90deg, #ff7a7a, #ff5e62);
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    cursor:pointer;
+    transition: background 0.3s;
+  }
+  .ics-btn:hover {
+    background: linear-gradient(90deg, #ff8a80, #ff6f61);
+  }
+`;
+document.head.appendChild(style);
 
 </script>
 </body>
