@@ -421,11 +421,18 @@ function updateSymptomChart() {
 
 
 // --- Historia i kalendarz ---
-function updateHistory(){
-  const tbody=document.getElementById('historyTable'); tbody.innerHTML='';
-  periods.forEach(p=>{
-    const len=(parseDate(p.end)-parseDate(p.start))/(1000*60*60*24)+1;
-    tbody.innerHTML+=`<tr><td>${p.start}</td><td>${p.end}</td><td>${len}</td></tr>`;
+function updateHistory() {
+  const tbody = document.getElementById('historyTable');
+  tbody.innerHTML = '';
+  periods.forEach(p => {
+    let endDisplay = p.end ? p.end : '(trwa)';
+    let len = p.end ? ( (parseDate(p.end) - parseDate(p.start)) / (1000*60*60*24) + 1 ) : '–';
+    tbody.innerHTML += `
+      <tr>
+        <td>${p.start}</td>
+        <td>${endDisplay}</td>
+        <td>${len}</td>
+      </tr>`;
   });
 }
 let currentCycleIndex = periods.length - 1;
