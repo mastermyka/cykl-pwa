@@ -163,7 +163,7 @@
 <div class="card">
 <h2>Historia cykli</h2>
 <table>
-<thead><tr><th>Początek</th><th>Koniec</th><th>Długość krwawienia</th></tr></thead>
+<thead><tr><th>Początek</th><th>Koniec</th><th>Długość</th><th>Akcja</th></tr></thead>
 <tbody id="historyTable"></tbody>
 </table>
 </div>
@@ -424,16 +424,30 @@ function updateSymptomChart() {
 function updateHistory() {
   const tbody = document.getElementById('historyTable');
   tbody.innerHTML = '';
-  periods.forEach(p => {
+  periods.forEach((p, i) => {
     let endDisplay = p.end ? p.end : '(trwa)';
-    let len = p.end ? ( (parseDate(p.end) - parseDate(p.start)) / (1000*60*60*24) + 1 ) : '–';
+    let len = p.end ? ((parseDate(p.end) - parseDate(p.start)) / (1000*60*60*24) + 1) : '–';
     tbody.innerHTML += `
       <tr>
         <td>${p.start}</td>
         <td>${endDisplay}</td>
         <td>${len}</td>
+        <td>
+          <button 
+            onclick="deletePeriod(${i})" 
+            style="background:#ff4d6d;color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;">
+            Usuń
+          </button>
+        </td>
       </tr>`;
   });
+}
+  function deletePeriod(index) {
+  if (!confirm('Na pewno chcesz usunąć ten okres?')) return;
+  periods.splice(index, 1);
+  saveHistory();
+  updateUI();
+  alert('Okres został usunięty.');
 }
 let currentCycleIndex = periods.length - 1;
 
