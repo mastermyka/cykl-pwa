@@ -696,6 +696,55 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-work
 // --- Start ---
 loadHistory();
 updateUI();
+function downloadICSWithAlert(eventTitle, eventDate) {
+  // Konwertujemy datę
+  const dt = new Date(eventDate);
+  const yyyy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2,'0');
+  const dd = String(dt.getDate()).padStart(2,'0');
+  const dtStart = `${yyyy}${mm}${dd}`;
+
+  // ICS z alarmem 1 dzień wcześniej (1440 minut)
+  const icsContent = `
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//TwójCykl//PWA//PL
+BEGIN:VEVENT
+UID:${Date.now()}@twojcykl
+DTSTAMP:${dtStart}T080000Z
+DTSTART;VALUE=DATE:${dtStart}
+DTEND;VALUE=DATE:${dtStart}
+SUMMARY:${eventTitle}
+DESCRIPTION:Przypomnienie z aplikacji Twój Cykl
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Przypomnienie: ${eventTitle}
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+  `.trim();
+
+  // Tworzymy plik i pobieramy
+  const blob = new Blob([icsContent], { type: 'text/calendar' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${eventTitle.replace(/\s/g,'_')}_${dtStart}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// --- Przykład użycia ---
+const info = getCycleInfo(periods);
+
+const buttonDiv = document.createElement('div');
+buttonDiv.style.marginTop = '1rem';
+buttonDiv.innerHTML = `
+  <button onclick="downloadICSWithAlert('Nadchodzący okres', '${info.nextPeriod}')">Dodaj przypomnienie okresu do kalendarza</button>
+  <button onclick="downloadICSWithAlert('Owulacja', '${info.ovulationDate}')">Dodaj przypomnienie owulacji do kalendarza</button>
+`;
+document.querySelector('.container').appendChild(buttonDiv);
 
 </script>
 </body>
