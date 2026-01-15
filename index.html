@@ -169,12 +169,15 @@
 </div>
 
 <div class="card">
-<h2>Dodaj nowy okres</h2>
-<label for="startDate">Początek okresu:</label>
-<input type="date" id="startDate">
-<label for="endDate">Koniec okresu:</label>
-<input type="date" id="endDate">
-<button onclick="addPeriod()">Dodaj okres</button>
+  <h2>Zarządzanie okresem</h2>
+
+  <label for="startDate">Początek okresu:</label>
+  <input type="date" id="startDate">
+  <button onclick="addPeriodStart()">Dodaj początek okresu</button>
+
+  <label for="endDate">Koniec okresu:</label>
+  <input type="date" id="endDate">
+  <button onclick="addPeriodEnd()">Zakończ bieżący okres</button>
 </div>
 
 <div class="card">
@@ -559,6 +562,45 @@ function addPeriod(){
   if(start && end){ periods.push({start,end}); saveHistory(); updateUI(); alert('Dodano okres!'); }
   else alert('Wprowadź obie daty.');
 }
+  function addPeriod(){
+  const start=document.getElementById('startDate').value;
+  const end=document.getElementById('endDate').value;
+  if(start && end){ 
+    periods.push({start,end}); 
+    saveHistory(); 
+    updateUI(); 
+    alert('Dodano okres!'); 
+  } else alert('Wprowadź obie daty.');
+}
+
+// --- Nowe funkcje: dodawanie początku i końca osobno ---
+function addPeriodStart() {
+  const start = document.getElementById('startDate').value;
+  if (!start) return alert('Podaj datę początku okresu!');
+  
+  // Sprawdź, czy ostatni okres nie jest już otwarty
+  const last = periods[periods.length - 1];
+  if (last && !last.end) return alert('Najpierw zakończ poprzedni okres!');
+  
+  periods.push({ start, end: null });
+  saveHistory();
+  updateUI();
+  alert('Dodano początek okresu!');
+}
+
+function addPeriodEnd() {
+  const end = document.getElementById('endDate').value;
+  if (!end) return alert('Podaj datę zakończenia okresu!');
+  
+  const last = periods[periods.length - 1];
+  if (!last || last.end) return alert('Brak rozpoczętego okresu do zakończenia!');
+  
+  last.end = end;
+  saveHistory();
+  updateUI();
+  alert('Zakończono bieżący okres!');
+}
+
 // --- Objawy dnia ---
 let symptoms = JSON.parse(localStorage.getItem('symptoms')) || {};
 function saveSymptoms(){
