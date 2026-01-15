@@ -691,21 +691,17 @@ function importHistory(){
 }
 
 // --- Service Worker ---
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany')); }
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW zarejestrowany'));
+}
 
 // --- Start ---
 loadHistory();
 updateUI();
+
+// --- Funkcja downloadICSWithAlert ---
 function downloadICSWithAlert(eventTitle, eventDate) {
   // Konwertujemy datę
-  const dt = new Date(eventDate);
-  const yyyy = dt.getFullYear();
-  const mm = String(dt.getMonth() + 1).padStart(2,'0');
-  const dd = String(dt.getDate()).padStart(2,'0');
-  const dtStart = `${yyyy}${mm}${dd}`;
-
-  // --- Funkcja downloadICSWithAlert (bez zmian) ---
-function downloadICSWithAlert(eventTitle, eventDate) {
   const dt = new Date(eventDate);
   const yyyy = dt.getFullYear();
   const mm = String(dt.getMonth() + 1).padStart(2,'0');
